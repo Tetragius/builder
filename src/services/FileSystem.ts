@@ -1,4 +1,6 @@
 import fs from 'memfs';
+import path from 'path-browserify';
+import { getPackageJson } from '../utils/getPackage';
 
 // core
 
@@ -11,23 +13,38 @@ export const readFileAsync = async (path: string): Promise<any> => new Promise(r
 
 export const readFileSync = (path: string, format: string) => fs.readFileSync(path, format);
 
-export const writeFileSync = (name: string, data: string) => fs.writeFileSync(name, data);
+export const writeFileSync = (name: string, data: string | ArrayBuffer) => fs.writeFileSync(name, data);
 
-export const mkdirSync = (path: string) => fs.mkdirSync(path);
+export const writeFileAsync = async (name: string, data: string | ArrayBuffer) => {
+  return new Promise(resolve => {
+    fs.writeFile(name, data, resolve);
+  })
+}
+
+export const mkdirSync = (path: string, opt?: any) => fs.mkdirSync(path, opt);
 
 export const existsSync = (path: string) => fs.existsSync(path);
+
+export const mkdirSyncReqFoeFile = (filePath: string) => {
+  const dirName = path.dirname(filePath);
+  fs.mkdirSync(dirName, { recursive: true });
+}
 
 // end core
 
 export const createAppContainer = () => {
-  fs.writeFileSync(`project/src/containers/index.ts`, `
+  fs.writeFileSync(`/project/src/containers/index.ts`, `
         export * from './App/index.ts';
     `);
-  fs.mkdirSync('project/src/containers/App');
-  fs.writeFileSync(`project/src/containers/App/index.ts`, `
+  fs.mkdirSync('/project/src/containers/App');
+  fs.writeFileSync(`/project/src/containers/App/index.ts`, `
         export * from './App.tsx';
     `);
-  fs.writeFileSync(`project/src/containers/App/App.tsx`, `
+  fs.writeFileSync(`/project/src/containers/App/App.styled.tsx`, `
+  import styled from 'styled-components';
+  export const Box = styled.div\`\`;
+    `);
+  fs.writeFileSync(`/project/src/containers/App/App.tsx`, `
         import React from 'react';
         import {Body} from 'vienna-ui';
 
@@ -47,7 +64,7 @@ export const createAppContainer = () => {
 };
 
 export const createIndexTs = () => {
-  fs.writeFileSync(`project/src/index.tsx`, `
+  fs.writeFileSync(`/project/src/index.tsx`, `
         import React from 'react';
         import ReactDOM from 'react-dom';
         import { App } from "./containers/index.ts";
@@ -57,9 +74,9 @@ export const createIndexTs = () => {
 };
 
 export const createContainer = (containerName: string) => {
-  fs.writeFileSync(`project/src/containers/${containerName}/${containerName}.tsx`, `
-        import React from 'react';
-        // import { Box } from './${containerName}.styled.tsx';
+  fs.writeFileSync(`/project/src/containers/${containerName}/${containerName}.tsx`, `
+        import React, {useEffect} from 'react';
+        import { Box } from './${containerName}.styled.tsx';
 
         // [[imports]]
 
@@ -67,10 +84,14 @@ export const createContainer = (containerName: string) => {
 
             // [[slots]]
 
+            useEffect(()=>{
+              console.log('ok');
+            })
+
             return (
-                <div>
+                <Box>
                     {/* [[code]] */}
-                </div>
+                </Box>
             );
         };
 
@@ -79,11 +100,11 @@ export const createContainer = (containerName: string) => {
 };
 
 export const createEmptyContainer = (containerName: string) => {
-  fs.mkdirSync(`project/src/containers/${containerName}`);
-  fs.writeFileSync(`project/src/containers/${containerName}/index.ts`, `
+  fs.mkdirSync(`/project/src/containers/${containerName}`);
+  fs.writeFileSync(`/project/src/containers/${containerName}/index.ts`, `
         export * from './${containerName}.tsx';
     `);
-  fs.writeFileSync(`project/src/containers/${containerName}/${containerName}.styled.tsx`, `
+  fs.writeFileSync(`/project/src/containers/${containerName}/${containerName}.styled.tsx`, `
         import styled from 'styled-components';
         export const Box = styled.div\`\`;
     `);
@@ -91,7 +112,7 @@ export const createEmptyContainer = (containerName: string) => {
 };
 
 export const createIndexEjs = () => {
-  fs.writeFileSync(`project/src/index.ejs`, `<!DOCTYPE html>
+  fs.writeFileSync(`/project/src/index.ejs`, `<!DOCTYPE html>
 <html lang="en">
     
     <head>
@@ -107,7 +128,7 @@ export const createIndexEjs = () => {
 };
 
 export const createPackageJson = () => {
-  fs.writeFileSync(`project/package.json`, `{
+  fs.writeFileSync(`/project/package.json`, `{
   "name": "project",
   "version": "1.0.0",
   "description": "",
@@ -124,7 +145,9 @@ export const createPackageJson = () => {
       "react-router": "5.2.0",
       "react-router-dom": "5.2.0",
       "styled-components": "5.2.3",
-      "vienna-ui": "2.0.4"
+      "vienna-ui": "2.0.4",
+      "stream": "0.0.2",
+      "emitter": "0.0.5"
   },
   "devDependencies": {
     "@babel/core": "^7.14.0",
@@ -139,7 +162,6 @@ export const createPackageJson = () => {
     "@types/react-router": "^5.1.13",
     "@types/react-router-dom": "^5.1.7",
     "@types/requirejs": "^2.1.32",
-    "@types/styled-components": "^5.1.9",
     "babel-loader": "^8.2.2",
     "babel-plugin-styled-components": "^1.12.0",
     "css-loader": "^5.2.4",
@@ -155,7 +177,7 @@ export const createPackageJson = () => {
 };
 
 export const createBabelConfig = () => {
-  fs.writeFileSync(`project/babel.config.js`, `module.exports = {
+  fs.writeFileSync(`/project/babel.config.js`, `module.exports = {
   presets: [
     "@babel/preset-env", "@babel/preset-typescript", "@babel/preset-react"
   ],
@@ -168,7 +190,7 @@ export const createBabelConfig = () => {
 };
 
 export const tsConfig = () => {
-  fs.writeFileSync(`project/tsconfig.json`, `{
+  fs.writeFileSync(`/project/tsconfig.json`, `{
   "compilerOptions": {
     "target": "es5",
     "module": "commonjs",
@@ -182,7 +204,7 @@ export const tsConfig = () => {
 };
 
 export const createWebpackConfig = () => {
-  fs.writeFileSync(`project/webpack.config.js`, `const path = require("path");
+  fs.writeFileSync(`/project/webpack.config.js`, `const path = require("path");
 const webpack = require("webpack");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 
@@ -235,10 +257,10 @@ module.exports = {
 };
 
 
-export const fsInit = () => {
-  mkdirSync('project');
-  mkdirSync('project/src');
-  mkdirSync('project/src/containers');
+export const fsInit = async () => {
+  mkdirSync('/project');
+  mkdirSync('/project/src');
+  mkdirSync('/project/src/containers');
   createIndexEjs();
   createIndexTs();
   createAppContainer();
@@ -246,4 +268,5 @@ export const fsInit = () => {
   createWebpackConfig();
   createBabelConfig();
   tsConfig();
+  getPackageJson();
 }

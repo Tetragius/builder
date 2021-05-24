@@ -1,6 +1,6 @@
 import { Plugin } from 'esbuild';
 import path from 'path-browserify';
-import { existsSync, readFileAsync } from '../FileSystem';
+import { existsSync, readFileAsync, readFileSync } from '../FileSystem';
 
 const namespace = 'virtual';
 
@@ -54,43 +54,98 @@ export const pluginEntryInstanse = (context: any, instanseName: string): Plugin 
 
 export const pluginGlobalExternal = (): Plugin => {
     return {
-        name: 'plugin-global-external',
+        name: 'plugin-modules',
         setup(build) {
 
-            build.onResolve({ filter: /.*/ }, (args) => {
-                if (['react', 'react-dom', 'react-router', 'react-router-dom', 'vienna-ui'].includes(args.path)) {
+            build.onResolve({ filter: /^([^\.\/]).*/ }, (args) => {
+
+                const filePath = `project/node_modules/${args.path}`;
+                const isJS = existsSync(`${filePath}.js`);
+                const isModule = existsSync(`${filePath}/package.json`);
+                const main = isModule && (JSON.parse(readFileSync(`${filePath}/package.json`, 'utf-8')).main ?? 'index.js');
+
+                const external = build.initialOptions.external?.includes(args.path);
+
+                if (external) {
                     return {
                         path: args.path,
-                        namespace: 'external',
+                        namespace: `node_modules:external`,
+                        pluginData: {
+                            ...args.pluginData,
+                            package: args.path,
+                        },
+                    };
+                }
+
+                if (isJS || isModule) {
+                    return {
+                        path: isJS ? `${filePath}.js` : path.resolve(filePath, main),
+                        namespace: `node_modules`,
+                        pluginData: {
+                            ...args.pluginData,
+                            package: args.path,
+                        },
                     };
                 }
             });
 
-            build.onLoad({ filter: /.*/, namespace: 'external' }, async (args) => {
-                if (args.path === 'react') {
-                    return {
-                        contents: `module.exports = window.React;`,
-                    };
+            build.onResolve({ filter: /.*/, namespace: 'node_modules' }, (args) => {
+
+                if (!/\.{1,2}\/.*(?<!\.js)$/.test(args.path)) {
+                    return;
                 }
-                if (args.path === 'react-dom') {
-                    return {
-                        contents: `module.exports = window.ReactDOM;`,
-                    };
+
+                const filePath = path.resolve(path.dirname(args.importer), args.path);
+                const isJS = existsSync(`${filePath}.js`);
+                const isFolder = existsSync(`${filePath}/index.js`);
+
+                return {
+                    path: isJS ? `${filePath}.js` : isFolder ? `${filePath}/index.js` : '',
+                    namespace: `node_modules`,
+                    pluginData: {
+                        ...args.pluginData,
+                        package: args.path
+                    }
                 };
-                if (args.path === 'react-router') {
-                    return {
-                        contents: `module.exports = window.ReactRouter;`,
-                    };
+            });
+
+            build.onResolve({ filter: /.*\.js$/, namespace: 'node_modules' }, (args) => {
+
+                const filePath = path.resolve(path.dirname(args.importer), args.path);
+
+                return {
+                    path: filePath,
+                    namespace: `node_modules`,
+                    pluginData: {
+                        ...args.pluginData,
+                        package: args.path
+                    }
                 };
-                if (args.path === 'react-router-dom') {
-                    return {
-                        contents: `module.exports = window.ReactRouterDOM;`,
-                    };
+            });
+
+            build.onLoad({ filter: /.*\.js$/, namespace: `node_modules` }, async (args) => {
+
+                const content = (await readFileAsync(args.path)).toString();
+
+                return {
+                    contents: content,
+                    pluginData: {
+                        importer: args.path,
+                    },
+                    loader: path.extname(args.path).slice(1) as 'js',
                 };
-                if (args.path === 'vienna-ui') {
-                    return {
-                        contents: `module.exports = window.ViennaUI;`,
-                    };
+            });
+
+            build.onLoad({ filter: /.*/, namespace: `node_modules:external` }, async (args) => {
+
+                const content = ` module.exports = window.__webpack_require__("./node_modules/${args.path}/index.js");`;
+
+                return {
+                    contents: content,
+                    pluginData: {
+                        importer: args.path,
+                    },
+                    loader: 'js',
                 };
             });
 
@@ -103,7 +158,7 @@ export const pluginMemfs = (context: any): Plugin => {
         name: 'memfs-plugin',
         setup(build) {
 
-            build.onResolve({ filter: /.*/, namespace: namespace }, (args) => {
+            build.onResolve({ filter: /^\.{1,2}\/.*/, namespace: namespace }, (args) => {
                 return {
                     path: args.path,
                     pluginData: args.pluginData,

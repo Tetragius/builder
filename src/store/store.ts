@@ -25,7 +25,7 @@ const initStore = {
         ]
     },
     fileSystem: [
-        { id: '1', name: 'project', isFolder: true, isOpen: true },
+        { id: '1', path: 'project', name: 'project', isFolder: true, isOpen: true },
         { id: '2', name: 'package.json', parentId: '1' },
         { id: '15', name: 'babel.config.js', parentId: '1' },
         { id: '16', name: 'tsconfig.json', parentId: '1' },

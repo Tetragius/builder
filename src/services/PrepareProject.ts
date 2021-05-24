@@ -130,9 +130,9 @@ instanse.subscribe('update', (e) => {
 
         writeFileSync(`${path}/${screen.name}.tsx`, data);
 
-        ESService.buildInstanse(screen.name);
+        // ESService.buildInstanse(screen.name);
 
     });
 
-    ESService.build();
+    // ESService.build();
 });

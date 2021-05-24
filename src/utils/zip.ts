@@ -5,7 +5,7 @@ import { prettierText } from './prettier';
 import { reconstructPath } from "./reconstructPath";
 
 export const zip = async (fileSystem) => {
-    const zip = new JSZip();;
+    const zip = new JSZip();
     fileSystem.filter(file => !file.isFolder).forEach(file => {
         const path = reconstructPath(file, fileSystem);
         const content = readFileSync(path, 'utf-8');
@@ -17,4 +17,9 @@ export const zip = async (fileSystem) => {
         zip.file(path, formated);
     })
     return await zip.generateAsync({ type: "blob" });
+}
+
+export const unzip = async (buffer: ArrayBuffer) => {
+    const zip = new JSZip();
+    return await zip.loadAsync(buffer);
 }

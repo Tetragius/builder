@@ -1,7 +1,6 @@
 const getUrl = (instanseName: string) => {
-    const code = localStorage.getItem(`script:instanse:${instanseName}`);
-    const file = new File([code ?? ''], `${instanseName}.mjs`, { type: 'application/javascript' });
-    return URL.createObjectURL(file);
+    const url = localStorage.getItem(`script:instanse:${instanseName}`) as string;
+    return url;
 }
 
 export const getCode = (instanseName: string) => {
