@@ -17,6 +17,7 @@ module.exports = {
   resolve: {
     extensions: [".ts", ".tsx", ".js", ".jsx", ".css"],
     fallback: {
+      fs: require.resolve("memfs"),
       stream: require.resolve("stream-browserify"),
       buffer: require.resolve("buffer"),
       path: require.resolve("path-browserify"),

@@ -12,7 +12,7 @@ export const Workplace = () => {
     const { store, state: { flags: { currentScreenId, viewAll }, screens, isDirTree } } = useRaxy(store => (
         {
             flags: store.flags.workplace,
-            screens: store.project.structure.filter(element => element.type === 'screen'),
+            screens: store.project.structure.filter(element => element.namespace === 'screen'),
             isDirTree: store.flags.leftBar.dirTree
         }));
 

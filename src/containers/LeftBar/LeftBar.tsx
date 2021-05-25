@@ -53,7 +53,7 @@ export const LeftBar = () => {
                 </ThemeProvider>
             </Head>
             <Content ref={ref}>
-                {dirTree && <DirTree item={fileSystem.find(item => !item.parentId)} />}
+                {dirTree && <DirTree item={fileSystem.find(item => item.path === '')} />}
                 {projectTree && <ProjectTree item={projectStructure.find(item => !item.parentId)} />}
                 {componentsLibrary && <ComponentsLibrary />}
             </Content>

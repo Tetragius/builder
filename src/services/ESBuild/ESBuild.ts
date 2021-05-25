@@ -23,6 +23,4 @@ esbuild.initialize({ wasmURL: 'esbuild.wasm' }).then(() => {
     }
 });
 
-window['esbuild'] = ESService;
-
 export default ESService;

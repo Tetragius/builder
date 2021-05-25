@@ -1,28 +1,35 @@
-import { createEmptyContainer, existsSync, fsInit } from ".";
+import { existsSync } from ".";
+import { IComponent } from "../interfaces";
+import { createEmptyContainer } from "../presets/basicProjectPreset";
 import { instanse } from '../store/store';
-import ESService from "./ESBuild/ESBuild";
-import { createContainer, readFileSync, writeFileSync } from "./FileSystem";
+import { readFileSync, writeFileSync } from "./FileSystem";
 
-fsInit();
+interface IImports {
+    [key: string]: IComponent
+}
 
-const getCode = (item: any, structure: any): [any, any, any, any] => {
-    const imports: any[] = [];
-    const slots: any[] = [];
-    const forwardSlots: any[] = [];
+interface ISlots {
+    [key: string]: string
+}
+
+const getCode = (item: IComponent, structure: IComponent[]): [IImports[], string, ISlots[], ISlots[]] => {
+    const imports: IImports[] = [];
+    const slots: ISlots[] = [];
+    const forwardSlots: ISlots[] = [];
     let code = '';
 
     structure
-        .filter((child: any) => child.parentId === item.id)
-        .forEach((child: any) => {
+        .filter(child => child.parentId === item.id)
+        .forEach(child => {
             const [_imports, _code, _slots, _forwardSolts] = getCode(child, structure);
 
-            if (child.type === 'slot') {
+            if (child.isSlot) {
                 imports.push(..._imports);
                 forwardSlots.push({ [`${child.name}_${child.id}`]: _code });
                 slots.push({ [`${child.name}_${child.id}`]: _code }, ..._slots);
             }
             else {
-                imports.push({ [child.type]: child }, ..._imports);
+                imports.push({ [child.namespace]: child }, ..._imports);
                 slots.push(..._slots);
                 const content = _code || (child?.props?.$text?.value ?? '');
                 code += `<${child.name} id='${child.id}' ${constructProps(child.props)} ${constructSlotsProps(_forwardSolts)}${content ? ` >${content}</${child.name}>` : ' />'}`
@@ -33,28 +40,29 @@ const getCode = (item: any, structure: any): [any, any, any, any] => {
     return [imports, code, slots, forwardSlots];
 }
 
-const constructImports = (imports: any[]): any[] => {
-    const result = [];
+const constructImports = (imports: IImports[]): string => {
+    const result: string[] = [];
 
-    const uniqKeys = Object.keys(imports.reduce((o: any, imp: any) => (o[Object.keys(imp)[0]] = true, o), {}));
+    const uniqKeys = Object.keys(imports.reduce((o: any, imp) => (o[Object.keys(imp)[0]] = true, o), {}));
 
     uniqKeys.forEach(key => {
         const childs = new Set(imports.filter(imp => imp[key]).map(imp => imp[key].name.split('.')[0]));
-        if (key === 'component') {
-            result.push(`import {${[...childs].join(',')}} from 'vienna-ui'`);
+        if (key && key !== 'native' && key !== 'custom') {
+            //@ts-ignore
+            result.push(`import {${[...childs].join(',')}} from '${key}'`);
         }
-        else if (key === 'router') {
-            result.push(`import {${[...childs].join(',')}} from '${imports.find(imp => imp[key])[key].namespace}'`);
+        else if (key === 'custom') {
+            childs.forEach(child => {
+                result.push(`import {${child}} from '../${child}/${child}.tsx'`);
+            })
         }
-        else {
-            result.push(`import {${key}} from '../${key}/${key}.tsx'`);
-        }
+
     })
 
     return result.length ? result.join('\n') : '';
 }
 
-export const cleanProp = (prop, value) => {
+export const cleanProp = (prop, value): string => {
     switch (true) {
         case prop.startsWith('$'):
             return '';
@@ -69,16 +77,16 @@ export const cleanProp = (prop, value) => {
     }
 }
 
-export const constructProps = (props) => {
-    const result = [];
+export const constructProps = (props): string => {
+    const result: string[] = [];
     for (const prop in props) {
         result.push(cleanProp(prop, props[prop].value));
     }
     return result.filter(r => r).join(' ');
 }
 
-export const constructSlotsProps = (slots) => {
-    const result = [];
+export const constructSlotsProps = (slots): string => {
+    const result: string[] = [];
     for (const slot of slots) {
         const key = Object.keys(slot)[0];
         const name = key.split('_')[0];
@@ -89,12 +97,12 @@ export const constructSlotsProps = (slots) => {
 }
 
 
-export const constructSlots = (slots) => {
-    const result = [];
+export const constructSlots = (slots): string => {
+    const result: string[] = [];
 
     const uniqKeys = Object.keys(slots.reduce((o: any, slot: any) => (o[Object.keys(slot)[0]] = true, o), {}));
 
-    uniqKeys.forEach(key => {
+    uniqKeys.reverse().forEach(key => {
         const childs = slots.filter(slot => slot[key]);
         if (childs.length === 1) {
             result.push(`const ${key} = ${childs[0][key]}`);
@@ -108,31 +116,26 @@ export const constructSlots = (slots) => {
 }
 
 instanse.subscribe('update', (e) => {
-    const structure = e.detail.store.project.structure;
-    const fs = e.detail.store.fileSystem;
+    const { structure, name } = e.detail.store.project;
 
-    const screens = structure.filter(item => item.type === 'screen');
+    const screens = structure.filter(item => item.custom);
 
-    screens.forEach((screen: any) => {
-        const path = `project/src/containers/${screen.name}`;
+    screens.forEach(screen => {
+        const path = `${name}/src/containers/${screen.name}`;
         if (!existsSync(path)) {
-            createEmptyContainer(screen.name);
+            createEmptyContainer(name, screen.name);
         }
 
-        createContainer(screen.name);
         let data = readFileSync(`${path}/${screen.name}.tsx`, 'utf-8');
 
         const [imports, code, slots] = getCode(screen, structure);
 
-        data = data.replace('// [[imports]]', constructImports(imports));
-        data = data.replace('{/* [[code]] */}', code);
-        data = data.replace('// [[slots]]', constructSlots(slots));
+        data = data.replace(/(\/\/ \[\[imports:start\]\]).*(\/\/ \[\[imports:end\]\])/gms, `$1\n${constructImports(imports)}\n$2`);
+        data = data.replace(/(\/\/ \[\[slots:start\]\]).*(\/\/ \[\[slots:end\]\])/gms, `$1\n${constructSlots(slots)}\n$2`);
+        data = data.replace(/(\{\/\* \[\[code:start\]\] \*\/\}).*(\{\/\* \[\[code:end\]\] \*\/\})/gms, `$1\n${code}\n$2`);
 
         writeFileSync(`${path}/${screen.name}.tsx`, data);
 
-        // ESService.buildInstanse(screen.name);
-
     });
 
-    // ESService.build();
 });

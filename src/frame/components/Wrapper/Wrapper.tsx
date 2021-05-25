@@ -14,6 +14,7 @@ import { removeElement } from "../../services/removeElement";
 import { extractProps, fillElement } from "../../services";
 import { Box, LT, LB, RT, RB, styleWithoutWrap, Delete } from "./Wrapper.styled";
 import ReactDOM from "react-dom";
+import { IComponent, IStore } from "../../../interfaces";
 
 export const _Wrapper = (props: any) => {
 
@@ -22,27 +23,27 @@ export const _Wrapper = (props: any) => {
   const {
     store,
     state: { selected, hovered, structure, item, code, isDragMode }
-  } = useRaxy((store) => ({
-    item: store.project.structure.find((item: any) => item.id === itemId),
+  } = useRaxy<IStore>((store) => ({
+    item: store.project.structure.find(item => item.id === itemId),
     get selected() { return store.project.selected === this.item },
     get hovered() { return store.project.hovered === this.item },
     get code() { return getCode(this.item.name) },
     structure: store.project.structure,
     isDragMode: store.flags.workplace.isDragMode,
-  } as any), {
+  }), {
     selected: { ignoreTimeStamp: true },
     hovered: { ignoreTimeStamp: true },
   });
 
-  const { props: componentProps, state: componentState, ...meta } = item as any;
+  const { props: componentProps, state: componentState, ...meta } = item as IComponent;
 
   nowrap = props.nowrap ?? meta.nowrap;
   const resizable = meta.resizable;
   const nowrapChildren = meta.nowrapChildren;
   const allowChildren = meta.allowChildren;
 
-  const componentChildren = structure.filter((child: any) => child.parentId === item.id && child.type !== 'slot');
-  const componentSlots = structure.filter((child: any) => child.parentId === item.id && child.type === 'slot');
+  const componentChildren = (structure as IComponent[]).filter((child: IComponent) => child.parentId === item.id && !child.isSlot);
+  const componentSlots = (structure as IComponent[]).filter((child: IComponent) => child.parentId === item.id && child.isSlot);
 
   const ref = useRef<HTMLElement>(null);
 
@@ -78,13 +79,13 @@ export const _Wrapper = (props: any) => {
 
   const constructSlots = () => {
     const result: any = {};
-    componentSlots.forEach((slot: any) => {
-      const slotsChildren = structure.filter((item: any) => item.parentId === slot.id);
+    componentSlots.forEach((slot) => {
+      const slotsChildren = (structure as IComponent[]).filter(item => item.parentId === slot.id);
       if (!slotsChildren.length) {
         result[slot.name] = <Wrapper key={slot.id} itemId={slot.id} />
       }
       else {
-        result[slot.name] = <>{slotsChildren.map((child: any) => <Wrapper key={child.id} itemId={child.id} />)}</>
+        result[slot.name] = <>{slotsChildren.map(child => <Wrapper key={child.id} itemId={child.id} />)}</>
       }
     });
     return result;

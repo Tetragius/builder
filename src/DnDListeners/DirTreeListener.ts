@@ -1,7 +1,8 @@
 import { DnDSinglle } from "../services"
 import { store } from "../store/store";
+import path from 'path';
 
-const checkTree = (id: number | undefined, reciever: any): boolean => {
+const checkTree = (id: string | undefined, reciever: any): boolean => {
 
     if (!reciever.parentId) {
         return false;
@@ -26,10 +27,10 @@ export const dirTreeListener = (message: any) => {
 
         if (item)
             if (recieverItem?.isFolder) {
-                item.parentId = recieverItem?.id;
+                item.path = path.resolve(recieverItem.path, recieverItem.name);
             }
-            else {
-                item.parentId = recieverItem?.parentId;
+            else if (recieverItem) {
+                item.path = path.resolve(recieverItem.path);
             }
 
     }

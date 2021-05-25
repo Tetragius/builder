@@ -9,7 +9,7 @@ import { useRaxy } from '../../store/store';
 import { Box, Struct, Icon, Name, Menu } from './ProjectTree.styles';
 import { uniqueId } from '../../frame/services';
 
-const getIcon = (type: string, iconName?: string) => {
+const getIcon = (type: string, iconName?: any) => {
     if (type === 'root') {
         return <Textarea />
     }
@@ -24,7 +24,8 @@ const getIcon = (type: string, iconName?: string) => {
 export const _ProjectTree = ({ item, onDragStart, onDragEnd, onDragOver, onDrop }: any) => {
 
     const { name, isOpen } = item;
-    const { store, state: { selected, projectStructure } } = useRaxy(store => ({
+    const { store, state: { selected, projectStructure, name: projectName } } = useRaxy(store => ({
+        name: store.project.name,
         selected: store.project.selected === item,
         projectStructure: store.project.structure,
     }));
@@ -60,27 +61,26 @@ export const _ProjectTree = ({ item, onDragStart, onDragEnd, onDragOver, onDrop 
             const root = projectStructure.find(item => !item.parentId);
             projectStructure.push({
                 id,
+                toolIcon: 'Body',
                 parentId: root?.id,
                 name,
-                type: 'screen',
+                namespace: 'screen',
                 isOpen: false
             });
 
             store.meta[name] = {
+                namespace: 'custom',
                 toolIcon: 'Body',
-                type: name,
                 allowChildren: null,
                 resizable: 'none',
                 nowrapChildren: true,
                 nowrap: false,
-                custom: true
             };
 
-            const idDir = uniqueId();
-            store.fileSystem.push({ id: idDir, name: `${name}`, isFolder: true, parentId: '4' });
-            store.fileSystem.push({ id: uniqueId(), name: `${name}.tsx`, parentId: idDir });
-            store.fileSystem.push({ id: uniqueId(), name: `${name}.styled.tsx`, parentId: idDir });
-            store.fileSystem.push({ id: uniqueId(), name: 'index.ts', parentId: idDir });
+            store.fileSystem.push({ id: uniqueId(), name: `${name}`, isFolder: true, path: `/${projectName}/src/containers`, editable: false, isOpen: false });
+            store.fileSystem.push({ id: uniqueId(), name: `${name}.tsx`, isFolder: false, path: `/${projectName}/src/containers/${name}`, editable: false, isOpen: false });
+            store.fileSystem.push({ id: uniqueId(), name: `${name}.styled.tsx`, isFolder: false, path: `/${projectName}/src/containers/${name}`, editable: false, isOpen: false });
+            store.fileSystem.push({ id: uniqueId(), name: 'index.ts', isFolder: false, path: `/${projectName}/src/containers/${name}`, editable: false, isOpen: false });
         }
 
     }, [])

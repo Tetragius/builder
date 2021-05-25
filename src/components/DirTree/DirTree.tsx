@@ -1,6 +1,7 @@
 import React, { useCallback } from 'react';
 import { Button } from 'vienna-ui';
 import { Download } from 'vienna.icons';
+import path from 'path';
 import { DnDHOC } from '../../services';
 import { useRaxy } from '../../store/store';
 import { sortDirArrayByName } from '../../utils/sortDirArrayByName';
@@ -11,17 +12,18 @@ import { FileIcon } from './Icons/file';
 import { OpenFolderIcon } from './Icons/open';
 import { zip } from '../../utils/zip';
 import { downlload } from '../../utils/donload';
+import { IFile } from '../../interfaces';
 
 export const _DirTree = ({ item, onDragStart, onDragEnd, onDragOver, onDrop }: any) => {
 
-    const { name, isFolder, isOpen } = item;
+    const { name, isFolder, isOpen } = item as IFile;
     const { store, state: { fileSystem } } = useRaxy(store => (
         {
             fileSystem: store?.fileSystem,
         }));
 
-    const children = store.fileSystem.reduce((o: any, i: any) => {
-        if (i.parentId === item.id) {
+    const children = store.fileSystem.reduce((o: any, i) => {
+        if (i.path === path.resolve(item.path, item.name)) {
             o.push(i);
         }
         return o;
@@ -56,7 +58,7 @@ export const _DirTree = ({ item, onDragStart, onDragEnd, onDragOver, onDrop }: a
             <Dir onClick={clickHandler} tabIndex={1}>
                 <Icon>{isFolder ? isOpen ? <OpenFolderIcon /> : <ClosedFolderIcon /> : <FileIcon />}</Icon>
                 <Name>{name ?? 'PROJECT'}</Name>
-                {!item.parentId &&
+                {!item.path &&
                     <Menu>
                         <Button onClick={downloadProject} design={'ghost'} size={'s'}><Download size={'s'} /></Button>
                     </Menu>

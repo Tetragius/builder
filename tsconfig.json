@@ -6,6 +6,7 @@
     "jsx": "react",
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
-    "noImplicitAny": false
+    "noImplicitAny": false,
+    "downlevelIteration": true,
   }
 }

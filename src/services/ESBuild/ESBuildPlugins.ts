@@ -1,5 +1,6 @@
 import { Plugin } from 'esbuild';
 import path from 'path-browserify';
+import { store } from '../../store/store';
 import { existsSync, readFileAsync, readFileSync } from '../FileSystem';
 
 const namespace = 'virtual';
@@ -24,7 +25,7 @@ export const pluginEntry = (context: any): Plugin => {
         setup(build) {
             build.onResolve({ filter: /^<stdin>$/ }, () => {
                 return {
-                    path: context?.options?.input ?? 'project/src/index.tsx',
+                    path: context?.options?.input ?? `${store.project.name}/src/index.tsx`,
                     namespace: namespace,
                     pluginData: {
                         importer: '',
@@ -41,7 +42,7 @@ export const pluginEntryInstanse = (context: any, instanseName: string): Plugin 
         setup(build) {
             build.onResolve({ filter: /^<instanse>$/ }, () => {
                 return {
-                    path: context?.options?.input ?? `project/src/containers/${instanseName}/index.ts`,
+                    path: context?.options?.input ?? `${store.project.name}/src/containers/${instanseName}/index.ts`,
                     namespace: namespace,
                     pluginData: {
                         importer: '',
@@ -59,7 +60,7 @@ export const pluginGlobalExternal = (): Plugin => {
 
             build.onResolve({ filter: /^([^\.\/]).*/ }, (args) => {
 
-                const filePath = `project/node_modules/${args.path}`;
+                const filePath = `${store.project.name}/node_modules/${args.path}`;
                 const isJS = existsSync(`${filePath}.js`);
                 const isModule = existsSync(`${filePath}/package.json`);
                 const main = isModule && (JSON.parse(readFileSync(`${filePath}/package.json`, 'utf-8')).main ?? 'index.js');

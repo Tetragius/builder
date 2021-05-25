@@ -1,11 +1,12 @@
 import React, { useEffect, useRef } from 'react';
 import * as monaco from 'monaco-editor';
+import path from 'path';
 import { Box } from './Code.styled';
 import { useRaxy } from '../../store/store';
 import { readFileSync } from '../../services';
-import { reconstructPath } from '../../utils/reconstructPath';
 import { getFileType } from '../../utils/getFileType';
 import { prettierText } from '../../utils/prettier';
+import { IFile } from '../../interfaces';
 
 export const Code = () => {
 
@@ -15,13 +16,13 @@ export const Code = () => {
     const { store: { fileSystem }, state: { currentFileId } } = useRaxy(store => ({ currentFileId: store.flags.workplace.currentFileId }));
 
     useEffect(() => {
-        if (ref.current) {
 
-            const file = fileSystem.find(file => file.id === currentFileId);
+        const file = fileSystem.find(file => file.id === currentFileId) as IFile;
+        if (ref.current && file) {
 
             const language = getFileType(file);
-            
-            const data = readFileSync(reconstructPath(file, fileSystem), 'utf-8');
+
+            const data = readFileSync(path.resolve(file.path, file.name), 'utf-8');
 
             const formated = language === 'typescript' ? prettierText(data) : data;
 
@@ -40,6 +41,8 @@ export const Code = () => {
                     theme: "vs-dark",
                     language
                 });
+
+                editor.current.onDidChangeModelContent(e => console.log(e));
             }
 
         }
