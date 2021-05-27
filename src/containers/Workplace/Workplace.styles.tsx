@@ -10,7 +10,7 @@ export const Box = styled.div`
 
 export const Main = styled.div<{ viewAll?: boolean; length?: number }>`
     position: relative;
-    height: calc(100% - 24px);
+    height: 100%;
     width: 100%;
     box-shadow: inset 0px 0px 4px 2px #8080807a;
     background: #80808012;
@@ -29,10 +29,4 @@ export const Main = styled.div<{ viewAll?: boolean; length?: number }>`
         }
     `}
 
-`;
-
-export const Status = styled.div`
-    position: relative;
-    height: 24px;
-    width: 100%;
 `;

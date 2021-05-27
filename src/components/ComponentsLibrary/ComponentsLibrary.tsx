@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button } from 'vienna-ui';
 import * as Icons from '../../builtin-icons';
-import { DnDHOC } from '../../services';
+import { DnDHOC } from '../../services/DnD';
 import { useRaxy } from '../../store/store';
 import { Box, Break } from './ComponentsLibrary.styles';
 

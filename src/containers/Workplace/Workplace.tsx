@@ -2,7 +2,7 @@ import PerfectScrollbar from 'perfect-scrollbar';
 import React, { useEffect, useRef } from 'react';
 import { Code, Frame } from '../../components';
 import { useRaxy } from '../../store/store';
-import { Box, Main, Status } from './Workplace.styles';
+import { Box, Main } from './Workplace.styles';
 
 export const Workplace = () => {
 
@@ -12,11 +12,11 @@ export const Workplace = () => {
     const { store, state: { flags: { currentScreenId, viewAll }, screens, isDirTree } } = useRaxy(store => (
         {
             flags: store.flags.workplace,
-            screens: store.project.structure.filter(element => element.namespace === 'screen'),
+            screens: store.project.structure.filter(element => element.namespace === 'layer'),
             isDirTree: store.flags.leftBar.dirTree
         }));
 
-    const screen = screens?.find(screen => screen.id === currentScreenId);
+    const layer = screens?.find(layer => layer.id === currentScreenId);
 
     // const messageHandler = useCallback((e: any) => {
     //     console.log(e.data);
@@ -47,18 +47,17 @@ export const Workplace = () => {
                 <Main ref={ref} viewAll={viewAll} length={screens.length}>
                     {viewAll
                         ?
-                        screens.map(screen => <Frame
-                            id={screen.id}
-                            key={screen.id}
-                            item={screen}
-                            onClick={() => store.flags.workplace.currentScreenId = screen.id}
+                        screens.map(layer => <Frame
+                            id={layer.id}
+                            key={layer.id}
+                            item={layer}
+                            onClick={() => store.flags.workplace.currentScreenId = layer.id}
                             onDoubleClick={() => store.flags.workplace.viewAll = false}
                         />)
-                        : screen ? <Frame key={screen.id} id={screen.id} item={screen} /> : null}
+                        : layer ? <Frame key={layer.id} id={layer.id} item={layer} /> : null}
                 </Main>
             }
             {isDirTree && <Main><Code /></Main>}
-            <Status />
         </Box>
     )
 }

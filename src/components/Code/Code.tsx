@@ -3,7 +3,7 @@ import * as monaco from 'monaco-editor';
 import path from 'path';
 import { Box } from './Code.styled';
 import { useRaxy } from '../../store/store';
-import { readFileSync } from '../../services';
+import { FS } from '../../services/FileSystem';
 import { getFileType } from '../../utils/getFileType';
 import { prettierText } from '../../utils/prettier';
 import { IFile } from '../../interfaces';
@@ -22,7 +22,8 @@ export const Code = () => {
 
             const language = getFileType(file);
 
-            const data = readFileSync(path.resolve(file.path, file.name), 'utf-8');
+            console.log(path.resolve(file.path, file.name))
+            const data = FS.readFileSync(path.resolve(file.path, file.name), 'utf-8');
 
             const formated = language === 'typescript' ? prettierText(data) : data;
 

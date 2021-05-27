@@ -1,4 +1,3 @@
-import { useRaxy } from "@tetragius/raxy-react";
 import React, {
   lazy,
   Suspense,
@@ -8,13 +7,13 @@ import React, {
   useRef
 } from "react";
 import { Close } from 'vienna.icons';
-import { DnDHOC } from "../../../services";
+import { DnDHOC } from "../../../services/DnD";
 import { getCode } from "../../../services/ModuleLoader";
-import { removeElement } from "../../services/removeElement";
-import { extractProps, fillElement } from "../../services";
 import { Box, LT, LB, RT, RB, styleWithoutWrap, Delete } from "./Wrapper.styled";
 import ReactDOM from "react-dom";
 import { IComponent, IStore } from "../../../interfaces";
+import { extractProps, fillElement, removeElement } from "../../../services/Core";
+import { useRaxy } from "@tetragius/raxy-react";
 
 export const _Wrapper = (props: any) => {
 
@@ -22,7 +21,7 @@ export const _Wrapper = (props: any) => {
 
   const {
     store,
-    state: { selected, hovered, structure, item, code, isDragMode }
+    state
   } = useRaxy<IStore>((store) => ({
     item: store.project.structure.find(item => item.id === itemId),
     get selected() { return store.project.selected === this.item },
@@ -35,7 +34,9 @@ export const _Wrapper = (props: any) => {
     hovered: { ignoreTimeStamp: true },
   });
 
-  const { props: componentProps, state: componentState, ...meta } = item as IComponent;
+  const { selected, hovered, structure, code, isDragMode } = state;
+  const item: IComponent = state.item;
+  const { props: componentProps, style: componentStyle, ...meta } = item;
 
   nowrap = props.nowrap ?? meta.nowrap;
   const resizable = meta.resizable;
@@ -105,33 +106,32 @@ export const _Wrapper = (props: any) => {
 
   const dragHandler = (e: any) => {
     if (store?.project.selected && drag.current) {
-      item.state.left = item.state.left + e.movementX;
-      item.state.top = item.state.top + e.movementY;
+      item.style.left = parseInt(item.style.left) + e.movementX;
+      item.style.top = parseInt(item.style.top) + e.movementY;
     }
   };
 
   const dragSizeHandler = (e: any) => {
-    const rect = ref.current?.getBoundingClientRect();
     if (store?.project.selected && dragSize.current) {
       if (dragSizeTarget.current === "lt") {
-        item.state.left = item.state.left + e.movementX;
-        item.state.width = (item.state.width ?? rect?.width) - e.movementX;
-        item.state.top = item.state.top + e.movementY;
-        item.state.height = (item.state.height ?? rect?.height) - e.movementY;
+        item.style.left = parseInt(item.style.left) + e.movementX;
+        item.style.width = parseInt(item.style.width) - e.movementX;
+        item.style.top = parseInt(item.style.top) + e.movementY;
+        item.style.height = parseInt(item.style.height) - e.movementY;
       }
       if (dragSizeTarget.current === "lb") {
-        item.state.left = item.state.left + e.movementX;
-        item.state.width = (item.state.width ?? rect?.width) - e.movementX;
-        item.state.height = (item.state.height ?? rect?.height) + e.movementY;
+        item.style.left = parseInt(item.style.left) + e.movementX;
+        item.style.width = parseInt(item.style.width) - e.movementX;
+        item.style.height = parseInt(item.style.height) + e.movementY;
       }
       if (dragSizeTarget.current === "rt") {
-        item.state.width = (item.state.width ?? rect?.width) + e.movementX;
-        item.state.top = item.state.top + e.movementY;
-        item.state.height = (item.state.height ?? rect?.height) - e.movementY;
+        item.style.width = parseInt(item.style.width) + e.movementX;
+        item.style.top = parseInt(item.style.top) + e.movementY;
+        item.style.height = parseInt(item.style.height) - e.movementY;
       }
       if (dragSizeTarget.current === "rb") {
-        item.state.width = (item.state.width ?? rect?.width) + e.movementX;
-        item.state.height = (item.state.height ?? rect?.height) + e.movementY;
+        item.style.width = parseInt(item.style.width) + e.movementX;
+        item.style.height = parseInt(item.style.height) + e.movementY;
       }
     }
   };
@@ -194,7 +194,7 @@ export const _Wrapper = (props: any) => {
         isDragMode={isDragMode}
         resizable={resizable}
         name={item.name}
-        {...componentState}
+        style={componentStyle}
       >
         <Suspense fallback={''}>
           <Instanse {...forwardProps} {...extractProps(componentProps)} {...constructSlots()}>

@@ -1,19 +1,20 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import { Button } from 'vienna-ui';
 import { CardAddNew } from 'vienna.icons';
 import { RightSmall, DownSmall } from 'vienna.icons';
 import * as Icons from '../../builtin-icons';
 import { Body, Textarea } from '../../builtin-icons';
-import { DnDHOC } from '../../services';
+import { IComponent } from '../../interfaces';
+import { CreateLayer } from '../../modals/CreateLayer';
+import { DnDHOC } from '../../services/DnD';
 import { useRaxy } from '../../store/store';
 import { Box, Struct, Icon, Name, Menu } from './ProjectTree.styles';
-import { uniqueId } from '../../frame/services';
 
 const getIcon = (type: string, iconName?: any) => {
     if (type === 'root') {
         return <Textarea />
     }
-    if (type === 'screen') {
+    if (type === 'layer') {
         return <Body />
     }
 
@@ -23,12 +24,12 @@ const getIcon = (type: string, iconName?: any) => {
 
 export const _ProjectTree = ({ item, onDragStart, onDragEnd, onDragOver, onDrop }: any) => {
 
-    const { name, isOpen } = item;
-    const { store, state: { selected, projectStructure, name: projectName } } = useRaxy(store => ({
-        name: store.project.name,
+    const { name, isOpen, namespace } = item as IComponent;
+    const { store, state: { selected } } = useRaxy(store => ({
         selected: store.project.selected === item,
-        projectStructure: store.project.structure,
     }));
+
+    const [modalIsOpen, setModalIsOpen] = useState(false);
 
     const children = store.project.structure.filter(i => {
         return i.parentId === item.id;
@@ -44,46 +45,16 @@ export const _ProjectTree = ({ item, onDragStart, onDragEnd, onDragOver, onDrop 
     const clickHandler = useCallback((e) => {
         e.stopPropagation();
         store.project.selected = item;
-        if (item.type === 'screen') {
+        if (namespace === 'layer') {
             store.flags.workplace.currentScreenId = item.id;
             store.flags.workplace.viewAll = false;
         }
-        if (item.type === 'root') {
+        if (namespace === 'root') {
             store.flags.workplace.viewAll = true;
         }
     }, [])
 
-    const addContainer = useCallback(() => {
-        const id = uniqueId();
-        const name = prompt('Название компонента', `Container_${id}`);
 
-        if (name) {
-            const root = projectStructure.find(item => !item.parentId);
-            projectStructure.push({
-                id,
-                toolIcon: 'Body',
-                parentId: root?.id,
-                name,
-                namespace: 'screen',
-                isOpen: false
-            });
-
-            store.meta[name] = {
-                namespace: 'custom',
-                toolIcon: 'Body',
-                allowChildren: null,
-                resizable: 'none',
-                nowrapChildren: true,
-                nowrap: false,
-            };
-
-            store.fileSystem.push({ id: uniqueId(), name: `${name}`, isFolder: true, path: `/${projectName}/src/containers`, editable: false, isOpen: false });
-            store.fileSystem.push({ id: uniqueId(), name: `${name}.tsx`, isFolder: false, path: `/${projectName}/src/containers/${name}`, editable: false, isOpen: false });
-            store.fileSystem.push({ id: uniqueId(), name: `${name}.styled.tsx`, isFolder: false, path: `/${projectName}/src/containers/${name}`, editable: false, isOpen: false });
-            store.fileSystem.push({ id: uniqueId(), name: 'index.ts', isFolder: false, path: `/${projectName}/src/containers/${name}`, editable: false, isOpen: false });
-        }
-
-    }, [])
 
     return (
         <Box
@@ -100,13 +71,14 @@ export const _ProjectTree = ({ item, onDragStart, onDragEnd, onDragOver, onDrop 
                 <Name>{name}</Name>
                 {!item.parentId &&
                     <Menu>
-                        <Button onClick={addContainer} design={'ghost'} size={'s'}><CardAddNew size={'s'} /></Button>
+                        <Button onClick={() => setModalIsOpen(true)} design={'ghost'} size={'s'}><CardAddNew size={'s'} /></Button>
                     </Menu>
                 }
             </Struct>
             {
                 item.isOpen && children?.map((item: any) => <ProjectTree key={item.id} item={item} />)
             }
+            <CreateLayer isOpen={modalIsOpen} onClose={() => setModalIsOpen(false)}></CreateLayer>
         </Box>
     )
 }

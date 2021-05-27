@@ -8,6 +8,10 @@ interface IUIFlags {
         projectTree: boolean;
         componentsLibrary: boolean;
     },
+    rightBar: {
+        propsEditor: boolean;
+        stateEditor: boolean;
+    },
     workplace: {
         viewAll: boolean;
         currentScreenId: string | null;
@@ -19,8 +23,9 @@ interface IUIFlags {
 
 interface IProject {
     name: string;
-    selected: any;
-    hovered: any;
+    simpleLoading: boolean;
+    selected: IComponent | IFile;
+    hovered: IComponent | IFile;
     structure: IComponent[];
 }
 

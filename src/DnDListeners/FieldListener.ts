@@ -1,6 +1,6 @@
-import { addComponentToStore, createComponent, createSlot } from "../frame/services";
-import { store } from "../frame/store/store";
-import { DnDSinglle } from "../services"
+import { DnDSinglle } from "../services/DnD"
+import { addComponentToStore, createComponent, createSlot } from "../services/Core";
+import { store } from "../store/store";
 
 const createReq = (name, item, parentId) => {
     const component = createComponent(name, item, parentId);

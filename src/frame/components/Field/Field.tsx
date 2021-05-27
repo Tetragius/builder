@@ -1,7 +1,7 @@
 import { Raxy } from '@tetragius/raxy-react';
 import React from 'react';
 import { Body } from 'vienna-ui';
-import { frameRaxyInstanse } from '../../store/store';
+import { instanse } from '../../../store/store';
 import { Content } from './Content';
 import { Box, Global } from './Field.styles';
 
@@ -11,7 +11,7 @@ export const Field = () => {
     //     window.parent.postMessage('init', '*');
     // }, []);
 
-    return <Raxy value={frameRaxyInstanse}>
+    return <Raxy value={instanse}>
         <Body>
             <Box>
                 <Global />

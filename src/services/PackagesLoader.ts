@@ -1,8 +1,8 @@
-import { uniqueId } from "../frame/services";
 import path from 'path';
-import { mkdirSyncReqFoeFile, readFileAsync, writeFileAsync } from "."
+import { FS } from "."
 import { store } from "../store/store";
 import { untgz } from "../utils/tar";
+import { uniqueId } from './Core';
 
 interface IDep {
     name: string;
@@ -18,7 +18,7 @@ interface IFile {
 
 const defaultRegestry = 'https://registry.npmjs.org';
 const workRegestry = 'https://registry.npmjs.cf';
-const nmPath = () => `/${store.project.name}/node_modules`;
+const nmPath = (projectName: string) => `/${projectName}/node_modules`;
 
 export const downloadDepTarball = async (item: IDep): Promise<IDep> => {
     return { ...item, blob: await (await fetch(item.url.replace(defaultRegestry, workRegestry))).blob() };
@@ -54,8 +54,8 @@ export const getDependencies = async (json: any): Promise<IDep[]> => {
     return [];
 }
 
-export const loadPackages = async (jsonPath?: string) => {
-    const jsonFile = await readFileAsync(jsonPath ?? `${store.project.name}/package.json`);
+export const loadPackages = async (projectName: string, jsonPath?: string) => {
+    const jsonFile = await FS.readFileAsync(jsonPath ?? `${projectName}/package.json`);
     const json = JSON.parse(jsonFile);
     const dependencies = await getDependencies(json);
 
@@ -64,18 +64,18 @@ export const loadPackages = async (jsonPath?: string) => {
 
     const tarballs = await Promise.all(uniqDependencies.map(downloadDepTarball));
 
-    const nmDir = store.fileSystem.find(file => file.path === nmPath());
+    const nmDir = store.fileSystem.find(file => file.path === nmPath(projectName));
     if (!nmDir) {
-        store.fileSystem.push({ id: uniqueId(), path: `/${store.project.name}`, name: 'node_modules', isFolder: true, editable: false, isOpen: false });
+        store.fileSystem.push({ id: uniqueId(), path: `/${projectName}`, name: 'node_modules', isFolder: true, editable: false, isOpen: false });
     }
 
-    Promise.all(tarballs.map(async tarball => {
+    return Promise.all(tarballs.map(async tarball => {
         const unziped = await untgz(tarball.blob);
 
-        Promise.all(unziped.map(async (file: IFile) => {
-            const filePath = file.name.replace('package', `${nmPath()}/${tarball.name}`);
-            mkdirSyncReqFoeFile(filePath);
-            writeFileAsync(filePath, new Uint8Array(file.buffer));
+        return Promise.all(unziped.map(async (file: IFile) => {
+            const filePath = file.name.replace('package', `${nmPath(projectName)}/${tarball.name}`);
+            FS.mkdirSyncReqFoeFile(filePath);
+            await FS.writeFileAsync(filePath, new Uint8Array(file.buffer));
 
             const dirName = path.dirname(filePath);
             dirName

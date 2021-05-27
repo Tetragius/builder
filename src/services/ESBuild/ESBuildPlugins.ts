@@ -1,7 +1,8 @@
 import { Plugin } from 'esbuild';
 import path from 'path-browserify';
+import { IInstanseType } from '../../interfaces/IINstanseType';
 import { store } from '../../store/store';
-import { existsSync, readFileAsync, readFileSync } from '../FileSystem';
+import { FS } from '../FileSystem';
 
 const namespace = 'virtual';
 
@@ -12,7 +13,7 @@ const resolve = ({ id, importer }: { id: string; importer: string; }) => {
     }
     for (const x of ['', '.ts', '.js', '.css']) {
         const realPath = resolvedPath + x;
-        if (existsSync(realPath)) {
+        if (FS.existsSync(realPath)) {
             return realPath;
         }
     }
@@ -36,13 +37,13 @@ export const pluginEntry = (context: any): Plugin => {
     };
 };
 
-export const pluginEntryInstanse = (context: any, instanseName: string): Plugin => {
+export const pluginEntryInstanse = (context: any, instanseType: IInstanseType, instanseName: string): Plugin => {
     return {
         name: 'virtual-entry',
         setup(build) {
             build.onResolve({ filter: /^<instanse>$/ }, () => {
                 return {
-                    path: context?.options?.input ?? `${store.project.name}/src/containers/${instanseName}/index.ts`,
+                    path: context?.options?.input ?? `${store.project.name}/src/${instanseType}s/${instanseName}/index.ts`,
                     namespace: namespace,
                     pluginData: {
                         importer: '',
@@ -53,7 +54,41 @@ export const pluginEntryInstanse = (context: any, instanseName: string): Plugin 
     };
 };
 
-export const pluginGlobalExternal = (): Plugin => {
+const getLibMainFile = (libName: string) => {
+    const filePath = `${store.project.name}/node_modules/${libName}`;
+    const isJS = FS.existsSync(`${filePath}.js`);
+    const main = !isJS && (JSON.parse(FS.readFileSync(`${filePath}/package.json`, 'utf-8')).main ?? 'index.js');
+    return isJS ? `${filePath}.js` : path.resolve(filePath, main);
+}
+
+export const pluginEntryExternal = (context: any, libName: string): Plugin => {
+    return {
+        name: 'virtual-entry',
+        setup(build) {
+            build.onResolve({ filter: /^<lib>$/ }, () => {
+                return {
+                    path: context?.options?.input ?? getLibMainFile(libName),
+                    namespace: 'node_modules',
+                    pluginData: {
+                        importer: '',
+                    },
+                };
+            });
+        },
+    };
+};
+
+const getLibMainFileWebpackRelative = (libName: string) => {
+    const mask = {
+        'react': './node_modules/react/index.js',
+        'react-dom': './node_modules/react-dom/index.js',
+        'styled-components': './node_modules/styled-components/dist/styled-components.browser.esm.js',
+        'vienna-ui': './node_modules/vienna-ui/esm/index.js',
+    }
+    return mask[libName];
+}
+
+export const pluginGlobalExternal = (forceWebpack?: boolean): Plugin => {
     return {
         name: 'plugin-modules',
         setup(build) {
@@ -61,9 +96,8 @@ export const pluginGlobalExternal = (): Plugin => {
             build.onResolve({ filter: /^([^\.\/]).*/ }, (args) => {
 
                 const filePath = `${store.project.name}/node_modules/${args.path}`;
-                const isJS = existsSync(`${filePath}.js`);
-                const isModule = existsSync(`${filePath}/package.json`);
-                const main = isModule && (JSON.parse(readFileSync(`${filePath}/package.json`, 'utf-8')).main ?? 'index.js');
+                const isJS = FS.existsSync(`${filePath}.js`);
+                const isModule = FS.existsSync(`${filePath}/package.json`);
 
                 const external = build.initialOptions.external?.includes(args.path);
 
@@ -80,7 +114,7 @@ export const pluginGlobalExternal = (): Plugin => {
 
                 if (isJS || isModule) {
                     return {
-                        path: isJS ? `${filePath}.js` : path.resolve(filePath, main),
+                        path: getLibMainFile(args.path),
                         namespace: `node_modules`,
                         pluginData: {
                             ...args.pluginData,
@@ -97,8 +131,8 @@ export const pluginGlobalExternal = (): Plugin => {
                 }
 
                 const filePath = path.resolve(path.dirname(args.importer), args.path);
-                const isJS = existsSync(`${filePath}.js`);
-                const isFolder = existsSync(`${filePath}/index.js`);
+                const isJS = FS.existsSync(`${filePath}.js`);
+                const isFolder = FS.existsSync(`${filePath}/index.js`);
 
                 return {
                     path: isJS ? `${filePath}.js` : isFolder ? `${filePath}/index.js` : '',
@@ -126,7 +160,7 @@ export const pluginGlobalExternal = (): Plugin => {
 
             build.onLoad({ filter: /.*\.js$/, namespace: `node_modules` }, async (args) => {
 
-                const content = (await readFileAsync(args.path)).toString();
+                const content = (await FS.readFileAsync(args.path)).toString();
 
                 return {
                     contents: content,
@@ -139,7 +173,12 @@ export const pluginGlobalExternal = (): Plugin => {
 
             build.onLoad({ filter: /.*/, namespace: `node_modules:external` }, async (args) => {
 
-                const content = ` module.exports = window.__webpack_require__("./node_modules/${args.path}/index.js");`;
+                const isSimpleLoading = store.project.simpleLoading;
+
+                const content = !isSimpleLoading || forceWebpack ?
+                    `module.exports = window.__webpack_require__("${getLibMainFileWebpackRelative(args.path)}");`
+                    :
+                    `module.exports = window['${args.path}'];`;
 
                 return {
                     contents: content,
@@ -177,7 +216,7 @@ export const pluginMemfs = (context: any): Plugin => {
                     throw new Error('not found');
                 }
                 realPath = resolvePath;
-                const content = (await readFileAsync(realPath)).toString();
+                const content = (await FS.readFileAsync(realPath)).toString();
                 return {
                     contents: content,
                     pluginData: {

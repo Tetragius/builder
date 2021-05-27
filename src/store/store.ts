@@ -1,4 +1,4 @@
-import { raxyReact, logger, connectDevTools } from '@tetragius/raxy-react';
+import { raxyReact, logger, connectDevTools, IRaxyWithHook } from '@tetragius/raxy-react';
 import { IStore } from '../interfaces';
 import { metaViennaUi, metaNative, metaReactRouter } from './meta';
 
@@ -10,6 +10,10 @@ const initStore: IStore = {
             projectTree: false,
             componentsLibrary: false
         },
+        rightBar: {
+            propsEditor: true,
+            stateEditor: false
+        },
         workplace: {
             viewAll: true,
             currentScreenId: null,
@@ -19,7 +23,8 @@ const initStore: IStore = {
         }
     },
     project: {
-        name: 'MyProject',
+        name: '',
+        simpleLoading: true,
         selected: null,
         hovered: null,
         structure: []
@@ -27,7 +32,7 @@ const initStore: IStore = {
     fileSystem: []
 }
 
-export const instanse = raxyReact(initStore);
+export const instanse: IRaxyWithHook<IStore> = window.parent['raxyInstanse'] ?? raxyReact(initStore);
 export const { store, useRaxy } = instanse;
 
 // logger(instanse.subscribe)

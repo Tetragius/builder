@@ -1,12 +1,15 @@
 import { useRaxy } from '@tetragius/raxy-react';
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Wrapper } from '../..';
-import { DnDHOC } from '../../../../services';
+import { IStore } from '../../../../interfaces';
+import { DnDHOC } from '../../../../services/DnD';
 import { Box } from './Content.styles';
 
 export const _Content = ({ onDragStart, onDragEnd, onDragOver, onDrop }: any) => {
 
-    const { state: { structure } } = useRaxy(store => ({
+    const { state: { structure, styled, style } } = useRaxy<IStore>(store => ({
+        styled: store.project.structure.find(item => item.id === window.frameElement?.id)?.styled,
+        style: store.project.structure.find(item => item.id === window.frameElement?.id)?.style,
         structure: store.project.structure,
         length: store.project.structure.length
     }), { structure: { ignoreTimeStamp: true } })
@@ -17,6 +20,7 @@ export const _Content = ({ onDragStart, onDragEnd, onDragOver, onDrop }: any) =>
             onDragOver={onDragOver}
             onDragEnd={onDragEnd}
             onDrop={onDrop}
+            style={styled ? style : {}}
         >
             {structure?.filter(s => s.parentId == window.frameElement?.id).map(item => (
                 <Wrapper key={item.id} itemId={item.id} />

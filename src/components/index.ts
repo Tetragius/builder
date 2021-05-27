@@ -3,4 +3,5 @@ export * from './ProjectTree';
 export * from './ComponentsLibrary';
 export * from './Frame';
 export * from './PropsEditor';
+export * from './StateEditor';
 export * from './Code';

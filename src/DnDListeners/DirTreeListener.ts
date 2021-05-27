@@ -1,4 +1,4 @@
-import { DnDSinglle } from "../services"
+import { DnDSinglle } from "../services/DnD"
 import { store } from "../store/store";
 import path from 'path';
 

@@ -1,22 +1,23 @@
 import JSZip from 'jszip';
 import path from 'path';
 import { IFile } from '../interfaces';
-import { readFileSync } from "../services";
+import { FS } from "../services/FileSystem";
 import { getFileType } from './getFileType';
 import { prettierText } from './prettier';
 
-export const zip = async (fileSystem: IFile[]) => {
+export const zip = async (projectName: string, fileSystem: IFile[]) => {
     const zip = new JSZip();
     fileSystem
         .filter(file => !file.isFolder)
+        .filter(file => !file.path.includes('node_modules'))
         .forEach(file => {
-            const content = readFileSync(path.resolve(file.path, file.name), 'utf-8');
+            const content = FS.readFileSync(path.resolve(file.path, file.name), 'utf-8');
 
             const language = getFileType(file);
 
             const formated = language === 'typescript' ? prettierText(content) : content;
 
-            zip.file(path.resolve(file.path, file.name), formated);
+            zip.file(path.resolve(file.path, file.name).replace(`/${projectName}/`, ''), formated);
         })
     return await zip.generateAsync({ type: "blob" });
 }

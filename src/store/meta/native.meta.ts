@@ -4,18 +4,22 @@ export const metaNative: IMeta = {
     'div': {
         namespace: 'native',
         toolIcon: 'Body',
+        allowChildren: 'all',
+        resizable: 'all',
         props: {
-            $text: { value: '' }
+            $text: { value: '' },
+            className: { value: '' },
         }
     },
-    'input': {
+    'span': {
         namespace: 'native',
-        toolIcon: 'Input',
-        allowChildren: null,
+        toolIcon: 'Body',
+        allowChildren: 'all',
+        resizable: 'all',
         props: {
-            value: { value: '' },
-            checked: { value: false, values: [true, false] }
-        }
+            $text: { value: '' },
+            className: { value: '' },
+        }        
     },
 };
 

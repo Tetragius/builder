@@ -1,8 +1,10 @@
+import { IInstanseType } from "./IINstanseType";
+
 type ResizeTypes = 'none' | 'all' | 'x' | 'y';
 
 type ChildrenTypes = 'all' | 'string' | null | string[];
 
-type NamespesTypes = 'native' | 'custom' | 'screen' | string;
+type NamespesTypes = 'native' | 'custom' | 'layer' | string;
 
 interface IStringProps {
     value: string;
@@ -20,19 +22,7 @@ interface IBoolProps {
 
 type MetsPropTypes = IStringProps | IListProps | IBoolProps | undefined;
 
-interface IMetaStyle {
-    [name: string]: string;
-}
-
-interface IMetaItemState {
-    left?: number;
-    right?: number;
-    top?: number;
-    bottom?: number;
-    height?: number;
-    width?: number;
-    style?: IMetaStyle;
-}
+interface IMetaStyle { }
 
 interface IMetaItemProps {
     $text?: IStringProps;
@@ -40,6 +30,7 @@ interface IMetaItemProps {
 }
 
 export interface IMetaItem {
+    type?: IInstanseType;
     namespace: NamespesTypes;
     toolIcon: string;
     resizable?: ResizeTypes;
@@ -49,7 +40,7 @@ export interface IMetaItem {
     disallowChildren?: ChildrenTypes
     defaultChildren?: string[];
     props?: IMetaItemProps;
-    state?: IMetaItemState;
+    style: any;
     esmLink?: string;
     slots?: string[]
 }

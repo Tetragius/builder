@@ -48,29 +48,25 @@ export const RB = styled.div`
 export const Delete = styled.div<{ fixed?: boolean; right?: number; top?: number; }>`
   box-sizing: border-box;
   position:  ${({ fixed }) => fixed ? 'fixed' : 'absolute'};
-  border-radius: 16px;
-  background: rgb(232, 232, 232);
-  height: 32px;
-  width: 32px;
-  right: ${({ right }) => (right ?? 0) + 4}px;
-  top: ${({ top }) => (top ?? 0) + 4}px;
+  background: black;
+  color: white;
+  height: 16px;
+  width: 16px;
+  right: ${({ right }) => right ?? 0}px;
+  top: ${({ top }) => top ?? 0}px;
   cursor: pointer;
-  opacity: 0.2;
+  opacity: 0.5;
   transition: all .2s;
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 10000;
   &:hover {
-    opacity: 0.5;
+    opacity: 1;
   }
 `
 
 export const Box = styled.div<{
-  left?: any;
-  top?: any;
-  width?: any;
-  height?: any;
   selected?: boolean;
   hovered?: boolean;
   resizable?: any;
@@ -78,34 +74,9 @@ export const Box = styled.div<{
   isDragMode?: boolean;
 }>`
   box-sizing: border-box;
-  display: inline-block;
+  display: block;
 
   position: relative;
-
-  left: ${({ left }) => left ?? "0"}px;
-  top: ${({ top }) => top ?? "0"}px;
-
-  width: auto;
-  height: auto;
-
-  ${({ resizable, width, height }) =>
-    resizable === "all" &&
-    css`
-      width: ${width ?? ""}px;
-      height: ${height ?? ""}px;
-    `}
-
-  ${({ resizable, width }) =>
-    resizable === "x" &&
-    css`
-     width: ${width ?? ""}px;
-    `}
-
-  ${({ resizable, height }) =>
-    resizable === "y" &&
-    css`
-    height: ${height ?? ""}px;
-    `}
 
   user-select: none;
 
