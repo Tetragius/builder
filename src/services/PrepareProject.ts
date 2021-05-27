@@ -1,6 +1,7 @@
+import path from 'path';
 import { FS } from ".";
 import { IComponent } from "../interfaces";
-import { instanse } from '../store/store';
+import { instanse, store } from '../store/store';
 import { capitalizeString } from "../utils/capitalizeString";
 
 interface IImports {
@@ -57,7 +58,7 @@ const getCode = (item: IComponent, structure: IComponent[]): [IImports[], string
     return [imports, code, slots, forwardSlots];
 }
 
-const constructImports = (imports: IImports[]): string => {
+const constructImports = (container: IComponent, imports: IImports[]): string => {
     const result: string[] = [];
 
     const uniqKeys = Object.keys(imports.reduce((o: any, imp) => (o[Object.keys(imp)[0]] = true, o), {}));
@@ -70,7 +71,11 @@ const constructImports = (imports: IImports[]): string => {
         }
         else if (key === 'custom') {
             childs.forEach(child => {
-                result.push(`import {${child}} from '../${child}/${child}.tsx'`);
+                const containerFolder = store.fileSystem.find(folder => folder.id === container.folderId);
+                const importItem = store.project.structure.find(item => item.name === child);
+                const importFolder = store.fileSystem.find(folder => folder.id === importItem?.folderId);
+                const relative = path.relative(`${containerFolder?.path}/${containerFolder?.name}`, `${importFolder?.path}/${importFolder?.name}`);
+                result.push(`import {${child}} from '${relative}/${child}.tsx'`);
             })
         }
 
@@ -93,7 +98,7 @@ const constructStyledImports = (container: IComponent, imports: IImports[]): str
     }).filter(c => c);
     if (container.styled) components.unshift('Box');
 
-    return `import { ${components.join(',')} } from './${container.name}.styled.tsx';`;
+    return components.length && `import { ${components.join(',')} } from './${container.name}.styled.tsx';` || '';
 };
 
 const constructStyled = (container: IComponent, imports: IImports[]): string => {
@@ -196,7 +201,7 @@ instanse.subscribe('update', async (e) => {
 
             const [imports, code, slots] = getCode(layer, structure);
 
-            data = data.replace(/(\/\/ \[\[imports:start\]\]).*(\/\/ \[\[imports:end\]\])/gms, `$1\n${constructImports(imports)}\n$2`);
+            data = data.replace(/(\/\/ \[\[imports:start\]\]).*(\/\/ \[\[imports:end\]\])/gms, `$1\n${constructImports(layer, imports)}\n$2`);
             data = data.replace(/(\/\/ \[\[styled:start\]\]).*(\/\/ \[\[styled:end\]\])/gms, `$1\n${constructStyledImports(layer, imports)}\n$2`);
             data = data.replace(/(\/\/ \[\[slots:start\]\]).*(\/\/ \[\[slots:end\]\])/gms, `$1\n${constructSlots(slots)}\n$2`);
             data = data.replace(/(\/\/ \[\[code:start\]\]).*(\/\/ \[\[code:end\]\])/gms, `$1\n${wrapCode(layer, code)}\n$2`);
