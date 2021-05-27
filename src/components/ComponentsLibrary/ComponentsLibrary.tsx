@@ -3,6 +3,7 @@ import { Button } from 'vienna-ui';
 import * as Icons from '../../builtin-icons';
 import { DnDHOC } from '../../services/DnD';
 import { useRaxy } from '../../store/store';
+import { sortMetaArray } from '../../utils/sortDirArrayByName';
 import { Box, Break } from './ComponentsLibrary.styles';
 
 export const ComponentsLibrary = () => {
@@ -24,10 +25,7 @@ export const ComponentsLibrary = () => {
     });
 
     return <Box>
-        {keys.map(key => {
-            if (key.startsWith('break')) {
-                return <Break key={key} />;
-            }
+        {keys.sort(sortMetaArray).map(key => {
             return <DnDButton key={key} name={key} item={meta[key]} />
         })}
     </Box>
