@@ -3,11 +3,13 @@ import path from 'path';
 import * as Router from "react-router-dom";
 import { Slot } from "../frame/components";
 import { loadInstanse } from "./ModuleLoader";
-import { IComponent, IMetaItem } from "../interfaces";
+import { IComponent, IFile, IMetaItem } from "../interfaces";
 import React from "react";
 import { store } from "../store/store";
 import { FS } from "./FileSystem";
 import { IProjectStructure } from "../interfaces/IProjectStructure";
+import { defaultStyle } from "../store/meta/style";
+import { cloneObject } from "../utils/cloneObject";
 
 const takeElementFromLib = (lib: any, name: any) => {
     return name?.split(".")
@@ -27,7 +29,7 @@ export const getElement = async (item: IComponent): Promise<any> => {
         case item.custom:
             return loadInstanse(item.name);
         case item.namespace === 'native':
-            return (props) => React.createElement(item.name, { ...props }, React.Children.toArray(props.children));
+            return (props) => React.createElement(item.name, { ...props }, item.allowChildren ? React.Children.toArray(props.children) : null);
         case item.namespace === 'react-router-dom':
             return takeElementFromLib(Router, item.name);
         case item.namespace === 'vienna-ui':
@@ -44,38 +46,9 @@ export const fillElement = async (item: IComponent, styler: any, nowrap: boolean
 
     const instanse = await getElement(item);
 
-    return { default: nowrap ? (item.namespace === 'vienna-ui' ? styler(instanse) : instanse) : instanse };
+    return { default: nowrap ? styler(instanse) : instanse };
 };
 
-export const defaultStyle = {
-    position: 'relative',
-    left: 0,
-    top: 0,
-    display: 'block',
-    height: 100,
-    width: 100,
-    padding: '',
-    margin: '',
-    border: '',
-    outline: '',
-    borderRadius: '',
-    borderTopLeftRadius: '',
-    borderTopRightRadius: '',
-    borderBottomLeftRadius: '',
-    borderBottomRightRadius: '',
-    boxShadow: '',
-    boxSizing: '',
-    background: '',
-    color: '',
-    fontSize: '',
-    lineHeight: '',
-    alignItems: '',
-    justifyContent: '',
-    flexDirection: '',
-    flexWrap: '',
-    cursor: '',
-    opacity: ''
-}
 
 export const createComponent = (name: string, meta: IMetaItem, parentId: string): IComponent => {
     return {
@@ -84,7 +57,7 @@ export const createComponent = (name: string, meta: IMetaItem, parentId: string)
         parentId,
         custom: meta.namespace === 'custom',
         ...meta,
-        style: { ...defaultStyle },
+        style: { ...cloneObject(defaultStyle) },
     }
 }
 
@@ -123,12 +96,40 @@ const getRemIdxs = (item) => store.project.structure
     .reduce((o, i) => (o.push(...i), o), []);
 
 
-export const removeElement = (item) => {
+export const removeElement = (item: IComponent) => {
     const remIdxs = getRemIdxs(item);
 
     remIdxs.sort((a, b) => b - a).forEach(idx => {
         store.project.structure.splice(idx, 1);
     });
+}
+
+const getRemIdxsFile = (item): number[] => store.fileSystem
+    .map((i, idx) => `${i?.path}/${i?.name}`.includes(item.name) ? idx : false)
+    .filter(Boolean) as number[];
+
+
+export const removeFile = (item: IFile) => {
+    const remIdxs = getRemIdxsFile(item);
+
+    remIdxs.sort((a, b) => b - a).forEach(idx => {
+        store.fileSystem.splice(idx, 1);
+    });
+}
+
+export const removeLayer = (item: IComponent) => {
+
+    const folderId = item.folderId;
+    const name = item.name;
+
+    const remList = store.project.structure.filter(item => item.name == name);
+    remList.forEach(removeElement);
+
+    const folder = store.fileSystem.find(folder => folder.id === folderId) as IFile;
+    FS.removeFolder(`${folder?.path}/${folder?.name}`);
+    removeFile(folder);
+
+    delete store.meta[name];
 }
 
 export const appendFileSystemProjectRoot = (name: string) => {
@@ -165,4 +166,42 @@ export const createProjectStructure = (structure: IProjectStructure) => {
     structure.forEach(item => {
         appendFileSystemItem(item.path, item.name, item.isFolder, item.content);
     });
+}
+
+export const removeChildren = (item: IComponent) => {
+    store.project.structure.forEach(i => {
+        if (i.parentId === item.id) {
+            removeElement(i);
+        }
+    });
+}
+
+export const updateMetaAndExistItems = (layer: IComponent, hasChildren) => {
+    if (hasChildren && !store.meta[layer.name].allowChildren) {
+
+        store.meta[layer.name].allowChildren = 'all';
+        store.meta[layer.name].props = {
+            $text: { value: '' }
+        }
+
+        store.project.structure.forEach(item => {
+            if (item.name === layer.name) {
+                item.allowChildren = 'all';
+                item.props = {
+                    $text: { value: '' }
+                }
+            }
+        })
+    }
+
+    if (!hasChildren && store.meta[layer.name].allowChildren) {
+        store.meta[layer.name].allowChildren = null;
+        store.project.structure.forEach(item => {
+            if (item.name === layer.name && item.id !== layer.id) {
+                item.allowChildren = null;
+                item.props = {};
+                removeChildren(item);
+            }
+        })
+    }
 }

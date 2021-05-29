@@ -27,6 +27,7 @@ export const _ProjectTree = ({ item, onDragStart, onDragEnd, onDragOver, onDrop 
     const { name, isOpen, namespace } = item as IComponent;
     const { store, state: { selected } } = useRaxy(store => ({
         selected: store.project.selected === item,
+        ioOpen: item.isOpen
     }));
 
     const [modalIsOpen, setModalIsOpen] = useState(false);

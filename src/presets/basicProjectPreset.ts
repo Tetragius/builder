@@ -1,8 +1,10 @@
-import { appendFileSystemItem, appendFileSystemProjectRoot, createProjectStructure, defaultStyle, uniqueId } from "../services/Core";
+import { appendFileSystemItem, appendFileSystemProjectRoot, createProjectStructure, uniqueId } from "../services/Core";
 import { loadPackages } from "../services/PackagesLoader";
 import { IProjectStructure } from "../interfaces/IProjectStructure";
 import { store } from "../store/store";
 import { IInstanseType } from "../interfaces/IINstanseType";
+import { defaultStyle } from "../store/meta/style";
+import { cloneObject } from "../utils/cloneObject";
 
 const basicProjectStructure: IProjectStructure = [
   {
@@ -209,7 +211,9 @@ export const createEmptyLayer = (name: string, type: IInstanseType) => {
     // [[imports:start]]
     // [[imports:end]]
 
-    export const ${name} = () => {
+    export const ${name} = (props) => {
+
+        const {children, ...attrs} = props;
 
         // [[slots:start]]
         // [[slots:end]]
@@ -233,7 +237,7 @@ export const createEmptyLayer = (name: string, type: IInstanseType) => {
     isOpen: false,
     folderId,
     type,
-    style: {...defaultStyle}
+    style: { ...cloneObject(defaultStyle) }
   });
 
   store.meta[name] = {

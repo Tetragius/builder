@@ -3,10 +3,17 @@ import { esBuildConfig, esBuildConfigInstanse, esBuildConfigExternal } from "./E
 
 const esbuild = require('esbuild-wasm');
 
-const ESService = { build: null, buildInstanse: null, buildExternal: null } as any;
+interface IESService {
+    build(): Promise<void>;
+    buildInstanse(instanseType: IInstanseType, instanseName: string): Promise<void>;
+    buildExternal(libName: string): Promise<void>;
+}
+
+//@ts-ignore
+const ESService: IESService = { build: null, buildInstanse: null, buildExternal: null };
 
 esbuild.initialize({ wasmURL: 'esbuild.wasm' }).then(() => {
-    ESService.build = async (external) => {
+    ESService.build = async () => {
         const data = await esbuild.build(esBuildConfig());
         data.outputFiles?.forEach((file: any) => {
             const _file = new File([file.text], `index.js`, { type: 'text/javascript' });

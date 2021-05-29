@@ -23,13 +23,15 @@ export const RightBar = () => {
 
     useEffect(() => {
         if (ref.current) {
-            refPS.current = new PerfectScrollbar(ref.current);
+            refPS.current = new PerfectScrollbar(ref.current, {
+                wheelPropagation: true,
+            });
         }
     }, [])
 
     useEffect(() => {
         refPS.current?.update();
-    }, [])
+    }, [Object.values(flags)])
 
     const barToggle = useCallback((e, value) => {
         for (const flag in flags) {

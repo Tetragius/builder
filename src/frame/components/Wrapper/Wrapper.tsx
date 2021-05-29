@@ -14,6 +14,7 @@ import ReactDOM from "react-dom";
 import { IComponent, IStore } from "../../../interfaces";
 import { extractProps, fillElement, removeElement } from "../../../services/Core";
 import { useRaxy } from "@tetragius/raxy-react";
+import { styleFormatter } from "../../../utils/styleFormatter";
 
 export const _Wrapper = (props: any) => {
 
@@ -106,32 +107,32 @@ export const _Wrapper = (props: any) => {
 
   const dragHandler = (e: any) => {
     if (store?.project.selected && drag.current) {
-      item.style.left = parseInt(item.style.left) + e.movementX;
-      item.style.top = parseInt(item.style.top) + e.movementY;
+      item.style.left.value = parseInt(item.style.left.value) + e.movementX;
+      item.style.top.value = parseInt(item.style.top.value) + e.movementY;
     }
   };
 
   const dragSizeHandler = (e: any) => {
     if (store?.project.selected && dragSize.current) {
       if (dragSizeTarget.current === "lt") {
-        item.style.left = parseInt(item.style.left) + e.movementX;
-        item.style.width = parseInt(item.style.width) - e.movementX;
-        item.style.top = parseInt(item.style.top) + e.movementY;
-        item.style.height = parseInt(item.style.height) - e.movementY;
+        item.style.left.value = parseInt(item.style.left.value) + e.movementX;
+        item.style.width.value = parseInt(item.style.width.value) - e.movementX;
+        item.style.top.value = parseInt(item.style.top.value) + e.movementY;
+        item.style.height.value = parseInt(item.style.height.value) - e.movementY;
       }
       if (dragSizeTarget.current === "lb") {
-        item.style.left = parseInt(item.style.left) + e.movementX;
-        item.style.width = parseInt(item.style.width) - e.movementX;
-        item.style.height = parseInt(item.style.height) + e.movementY;
+        item.style.left.value = parseInt(item.style.left.value) + e.movementX;
+        item.style.width.value = parseInt(item.style.width.value) - e.movementX;
+        item.style.height.value = parseInt(item.style.height.value) + e.movementY;
       }
       if (dragSizeTarget.current === "rt") {
-        item.style.width = parseInt(item.style.width) + e.movementX;
-        item.style.top = parseInt(item.style.top) + e.movementY;
-        item.style.height = parseInt(item.style.height) - e.movementY;
+        item.style.width.value = parseInt(item.style.width.value) + e.movementX;
+        item.style.top.value = parseInt(item.style.top.value) + e.movementY;
+        item.style.height.value = parseInt(item.style.height.value) - e.movementY;
       }
       if (dragSizeTarget.current === "rb") {
-        item.style.width = parseInt(item.style.width) + e.movementX;
-        item.style.height = parseInt(item.style.height) + e.movementY;
+        item.style.width.value = parseInt(item.style.width.value) + e.movementX;
+        item.style.height.value = parseInt(item.style.height.value) + e.movementY;
       }
     }
   };
@@ -174,7 +175,6 @@ export const _Wrapper = (props: any) => {
   const remove = useCallback(() => {
     removeElement(item);
   }, []);
-
   //
 
   if (!nowrap) {
@@ -194,7 +194,7 @@ export const _Wrapper = (props: any) => {
         isDragMode={isDragMode}
         resizable={resizable}
         name={item.name}
-        style={componentStyle}
+        style={styleFormatter(componentStyle)}
       >
         <Suspense fallback={''}>
           <Instanse {...forwardProps} {...extractProps(componentProps)} {...constructSlots()}>

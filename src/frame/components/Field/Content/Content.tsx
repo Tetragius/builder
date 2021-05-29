@@ -3,6 +3,7 @@ import React from 'react';
 import { Wrapper } from '../..';
 import { IStore } from '../../../../interfaces';
 import { DnDHOC } from '../../../../services/DnD';
+import { styleFormatter } from '../../../../utils/styleFormatter';
 import { Box } from './Content.styles';
 
 export const _Content = ({ onDragStart, onDragEnd, onDragOver, onDrop }: any) => {
@@ -20,7 +21,7 @@ export const _Content = ({ onDragStart, onDragEnd, onDragOver, onDrop }: any) =>
             onDragOver={onDragOver}
             onDragEnd={onDragEnd}
             onDrop={onDrop}
-            style={styled ? style : {}}
+            style={styled ? styleFormatter(style) : {}}
         >
             {structure?.filter(s => s.parentId == window.frameElement?.id).map(item => (
                 <Wrapper key={item.id} itemId={item.id} />

@@ -80,9 +80,9 @@ export const Box = styled.div<{
 
   user-select: none;
 
-  ${({ hovered }) => hovered && "outline: 1px dashed black;"}
+  ${({ hovered }) => hovered && "outline: 1px dashed black!important;"}
 
-  ${({ selected }) => selected && "outline: 1px dashed blue;"}
+  ${({ selected }) => selected && "outline: 1px dashed blue!important;"}
 
   ${({ isDragMode, name }) => isDragMode && css`
     &:after {
@@ -96,9 +96,9 @@ export const Box = styled.div<{
       color: white;
     }
     padding: 16px;
-    outline: 1px dashed black;
-    background-color: rgb(200, 225, 193, 0.1);
-    background-image: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%2373ab52' fill-opacity='0.1' fill-rule='evenodd'%3E%3Cpath d='M0 40L40 0H20L0 20M40 40V20L20 40'/%3E%3C/g%3E%3C/svg%3E");
+    outline: 1px dashed #020fcc!important;
+    background-color: rgb(200, 225, 193, 0.1)!important;
+    background-image: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%2373ab52' fill-opacity='0.1' fill-rule='evenodd'%3E%3Cpath d='M0 40L40 0H20L0 20M40 40V20L20 40'/%3E%3C/g%3E%3C/svg%3E")!important;
   `}
 
 `;
@@ -107,8 +107,8 @@ export const styleWithoutWrap = (element: any) => styled(element)`
 
   position: relative;
 
-  ${({ hovered }) => hovered && "outline: 1px dashed black;"}
-  ${({ selected }) => selected && "outline: 1px dashed blue;"}
+  ${({ hovered }) => hovered && "outline: 1px dashed black;!important"}
+  ${({ selected }) => selected && "outline: 1px dashed blue;!important"}
 
   ${({ isDragMode, name }) => isDragMode && css`
   &:after {
@@ -122,8 +122,8 @@ export const styleWithoutWrap = (element: any) => styled(element)`
       color: white;
     }
     padding: 16px;
-    outline: 1px dashed black;
-    background-color: rgb(200, 225, 193, 0.1);
-    background-image: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%2373ab52' fill-opacity='0.1' fill-rule='evenodd'%3E%3Cpath d='M0 40L40 0H20L0 20M40 40V20L20 40'/%3E%3C/g%3E%3C/svg%3E");
+    outline: 1px dashed black!important;
+    background-color: rgb(200, 225, 193, 0.1)!important;
+    background-image: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%2373ab52' fill-opacity='0.1' fill-rule='evenodd'%3E%3Cpath d='M0 40L40 0H20L0 20M40 40V20L20 40'/%3E%3C/g%3E%3C/svg%3E")!important;
   `}
 `;

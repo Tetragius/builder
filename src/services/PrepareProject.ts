@@ -2,7 +2,10 @@ import path from 'path';
 import { FS } from ".";
 import { IComponent } from "../interfaces";
 import { instanse, store } from '../store/store';
+import { camelToKebab } from '../utils/camelToKebab';
 import { capitalizeString } from "../utils/capitalizeString";
+import { styleFormatter } from '../utils/styleFormatter';
+import { updateMetaAndExistItems } from './Core';
 
 interface IImports {
     [key: string]: IComponent
@@ -12,20 +15,26 @@ interface ISlots {
     [key: string]: string
 }
 
-const camelToKebab = (str: string): string => str.replace(/([a-z])([A-Z])/gm, '$1-$2').toLowerCase();
-
-const styleArr = ['left', 'top', 'width', 'height'];
-const formatEntry = (entry: [string, string]) => {
-    if (styleArr.includes(entry[0])) {
-        return `${(parseInt(entry[1]) || 0)}px`;
-    }
-    return entry[1];
-}
-
-const objToCSS = (obj: { [x: string]: string }): string => Object.entries(obj ?? {})
-    .map(entry => !!entry[1] && `${camelToKebab(entry[0])}: ${formatEntry(entry)};`)
+const objToCSS = (obj: any): string => Object.entries(obj ?? {})
+    .map((entry: any) => {
+        if (!entry[1] || entry[1] === 'none' || entry[1] === 'normal') {
+            return false;
+        }
+        return `    ${camelToKebab(entry[0])}: ${entry[1]};`;
+    })
     .filter(Boolean)
     .join('\n');
+
+const contentBuilder = (code: string, item: IComponent) => {
+    const textValue = item?.props?.$text?.value;
+    if (textValue) {
+        if (textValue === '$children') {
+            return `{props.children}`;
+        }
+        return textValue;
+    }
+    return code;
+}
 
 const getCode = (item: IComponent, structure: IComponent[]): [IImports[], string, ISlots[], ISlots[]] => {
     const imports: IImports[] = [];
@@ -46,7 +55,7 @@ const getCode = (item: IComponent, structure: IComponent[]): [IImports[], string
             else {
                 imports.push({ [child.namespace]: child }, ..._imports);
                 slots.push(..._slots);
-                const content = _code || (child?.props?.$text?.value ?? '');
+                const content = contentBuilder(_code, child);
 
                 const componentName = child.styled ? `${capitalizeString(child.name)}_${child.id}` : child.name;
 
@@ -116,7 +125,7 @@ const constructStyled = (container: IComponent, imports: IImports[]): string => 
     if (container.styled) components.unshift(['Box', container]);
 
     return components.reduce((result, [name, component]) => {
-        result += `export const ${name} = styled.div\`\n${objToCSS(component.style)}\`;`;
+        result += `export const ${name} = styled.div\`\n${objToCSS(styleFormatter(component.style))}\`;`;
         return result;
     }, '') as string;
 
@@ -125,7 +134,7 @@ const constructStyled = (container: IComponent, imports: IImports[]): string => 
 const wrapCode = (container: IComponent, code: string): string => {
 
     if (container.styled) {
-        return `<Box>${code}</Box>`
+        return `<Box {...attrs}>${code}</Box>`
     }
 
     return `<>${code}</>`;
@@ -200,6 +209,8 @@ instanse.subscribe('update', async (e) => {
             let data = FS.readFileSync(`/${path}/${layer.name}.tsx`, 'utf-8');
 
             const [imports, code, slots] = getCode(layer, structure);
+
+            updateMetaAndExistItems(layer, code.includes('{props.children}'));
 
             data = data.replace(/(\/\/ \[\[imports:start\]\]).*(\/\/ \[\[imports:end\]\])/gms, `$1\n${constructImports(layer, imports)}\n$2`);
             data = data.replace(/(\/\/ \[\[styled:start\]\]).*(\/\/ \[\[styled:end\]\])/gms, `$1\n${constructStyledImports(layer, imports)}\n$2`);

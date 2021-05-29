@@ -27,11 +27,12 @@ interface IProject {
     selected: IComponent | IFile;
     hovered: IComponent | IFile;
     structure: IComponent[];
+    status: string;
 }
 
 export interface IStore {
     meta: IMeta;
     flags: IUIFlags;
     project: IProject;
-    fileSystem: IFile[]
+    fileSystem: IFile[];
 }

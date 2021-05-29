@@ -15,8 +15,16 @@ export const LeftBar = () => {
         {
             fileSystem: store?.fileSystem,
             projectStructure: store.project.structure,
+            fileSystemLength: store?.fileSystem.length,
+            projectStructureLength: store.project.structure.length,
+            selectedId: store.project.selected?.id,
             flags: store.flags.leftBar
-        }));
+        }),
+        {
+            fileSystem: { ignoreTimeStamp: true },
+            projectStructure: { ignoreTimeStamp: true }
+        }
+    );
 
     const { dirTree, projectTree, componentsLibrary } = flags;
 
@@ -33,7 +41,9 @@ export const LeftBar = () => {
 
     useEffect(() => {
         if (ref.current) {
-            refPS.current = new PerfectScrollbar(ref.current);
+            refPS.current = new PerfectScrollbar(ref.current, {
+                wheelPropagation: true,
+            });
         }
     }, [])
 

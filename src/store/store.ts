@@ -27,7 +27,8 @@ const initStore: IStore = {
         simpleLoading: true,
         selected: null,
         hovered: null,
-        structure: []
+        structure: [],
+        status: ''
     },
     fileSystem: []
 }
