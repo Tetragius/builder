@@ -83,6 +83,12 @@ export const extractProps = (props) => {
     const result = {};
 
     for (const prop in props) {
+        if (props[prop].allowAssetsUrl) {
+            const file = props[prop].value as IFile;
+            const url = props[prop].value ? FS.readFileSync(path.resolve(file.path, file.name)) : '';
+            result[prop] = url;
+            continue;
+        }
         if (!prop.startsWith('$')) {
             result[prop] = props[prop].value;
         }
@@ -139,7 +145,8 @@ export const appendFileSystemProjectRoot = (name: string) => {
         isFolder: true,
         path: '',
         editable: false,
-        isOpen: true
+        isOpen: true,
+        type: 'folder'
     });
 }
 
@@ -156,7 +163,8 @@ export const appendFileSystemItem = (dir: string, name: string, isFolder?: boole
         isFolder: isFolder ?? false,
         path: path.resolve(`./${store.project.name}`, `./${dir}`),
         editable: false,
-        isOpen: false
+        isOpen: false,
+        type: isFolder ? 'folder' : 'text'
     });
 
     return id;
@@ -176,7 +184,8 @@ export const removeChildren = (item: IComponent) => {
     });
 }
 
-export const updateMetaAndExistItems = (layer: IComponent, hasChildren) => {
+export const updateMetaAndExistItems = (layer: IComponent, hasChildren: boolean, slots: string[]) => {
+    
     if (hasChildren && !store.meta[layer.name].allowChildren) {
 
         store.meta[layer.name].allowChildren = 'all';
@@ -204,4 +213,5 @@ export const updateMetaAndExistItems = (layer: IComponent, hasChildren) => {
             }
         })
     }
+
 }

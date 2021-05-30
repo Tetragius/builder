@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react';
 import { Button } from 'vienna-ui';
-import { Download } from 'vienna.icons';
+import { Download, Upload } from 'vienna.icons';
 import path from 'path';
 import { DnDHOC } from '../../services/DnD';
 import { useRaxy } from '../../store/store';
@@ -14,6 +14,7 @@ import { zip } from '../../utils/zip';
 import { downlload } from '../../utils/donload';
 import { IFile } from '../../interfaces';
 import { ZipStatus } from '../../modals/ZipStatus';
+import { AssetsLoader } from '../../modals/AssetsLoader';
 
 export const _DirTree = ({ item, onDragStart, onDragEnd, onDragOver, onDrop }: any) => {
 
@@ -25,6 +26,7 @@ export const _DirTree = ({ item, onDragStart, onDragEnd, onDragOver, onDrop }: a
         }));
 
     const [progress, setProgress] = useState(false);
+    const [uploadModal, setUploadModal] = useState(false);
 
     const children = store.fileSystem.reduce((o: any, i) => {
         if (i.path === path.resolve(item.path, item.name)) {
@@ -40,7 +42,7 @@ export const _DirTree = ({ item, onDragStart, onDragEnd, onDragOver, onDrop }: a
             item.isOpen = !isOpen
         }
         else {
-            store.flags.workplace.currentFileId = item.id;
+            store.flags.workplace.currentFile = item;
         }
     }
 
@@ -65,7 +67,8 @@ export const _DirTree = ({ item, onDragStart, onDragEnd, onDragOver, onDrop }: a
                 <Icon>{isFolder ? isOpen ? <OpenFolderIcon /> : <ClosedFolderIcon /> : <FileIcon />}</Icon>
                 <Name>{name ?? 'PROJECT'}</Name>
                 {!item.path &&
-                    <Menu>
+                    <Menu>                        
+                        <Button onClick={() => setUploadModal(true)} design={'ghost'} size={'s'}><Upload size={'s'} /></Button>
                         <Button onClick={downloadProject} design={'ghost'} size={'s'}><Download size={'s'} /></Button>
                     </Menu>
                 }
@@ -74,6 +77,7 @@ export const _DirTree = ({ item, onDragStart, onDragEnd, onDragOver, onDrop }: a
                 item.isOpen && children?.map((item: any, idx: number) => <DirTree key={idx} item={item} />)
             }
             <ZipStatus isOpen={progress} />
+            <AssetsLoader isOpen={uploadModal} onClose={setUploadModal} />
         </Box>
     )
 }

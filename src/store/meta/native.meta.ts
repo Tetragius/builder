@@ -41,6 +41,16 @@ export const metaNative: IMeta = {
             className: { value: '' },
         }
     },
+    'img': {
+        namespace: 'native',
+        toolIcon: 'Body',
+        allowChildren: null,
+        resizable: 'all',
+        props: {
+            src: { value: '', allowAssetsUrl: true },
+            className: { value: '' },
+        }
+    },
 };
 
 export default metaNative;

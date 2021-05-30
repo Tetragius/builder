@@ -65,10 +65,21 @@ export const defaultStyle: IStyle & IFilter = {
     borderBottomLeftRadius: { value: '', demension: 'px', dictionaryName: 'size' },
     borderBottomRightRadius: { value: '', demension: 'px', dictionaryName: 'size' },
 
+    borderImageSource: { value: '', allowAssetsUrl: true },
+    borderImageRepeat: { value: '', values: ['space', 'repeat', 'round', 'stretch', 'revert', 'none'] },
+    borderImageWidth: { value: '', demension: 'px', dictionaryName: 'size' },
+    borderImageSlice: { value: '' },
+
+    //background
+    backgroundColor: { value: '', dictionaryName: 'color' },
+    backgroundImage: { value: '', allowAssetsUrl: true },
+    backgroundSize: { value: 'auto', values: ['auto', 'cover', 'contain', 'revert'] },
+    backgroundPosition: { value: 'unset', values: ['left', 'top', 'center', 'right', 'bottom', 'revert', 'unset'] },
+    backgroundRepeat: { value: 'none', values: ['no-repeat', 'repeat', 'repeat-x', 'repeat-y', 'none'] },
+
     //common
     boxShadow: { value: '' },
     boxSizing: { value: 'border-box', values: ['content-box', 'border-box', 'padding-box'] },
-    background: { value: '', $url: false, $complex: false, dictionaryName: 'color' },
     color: { value: '', dictionaryName: 'color' },
     fontSize: { value: '', demension: 'px', demensions: ['px', 'pt'] },
     lineHeight: { value: '', demension: 'px' },

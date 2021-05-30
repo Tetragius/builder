@@ -78,6 +78,36 @@ export const pluginEntryExternal = (context: any, libName: string): Plugin => {
     };
 };
 
+export const pluginImage = (context: any): Plugin => {
+    return {
+        name: 'image-plugin',
+        setup(build) {
+            build.onResolve({ filter: /\.(png|jpe?g|svg)$/ }, (args) => {
+                return {
+                    path: args.path,
+                    namespace: 'images',
+                    pluginData: {
+                        ...args.pluginData
+                    },
+                };
+            });
+            build.onLoad({ filter: /.*/, namespace: `images` }, async (args) => {
+
+                const filePath = path.resolve(path.dirname(args.pluginData.importer), args.path)
+                const content = (await FS.readFileAsync(filePath)).toString();
+                
+                return {
+                    contents: content,
+                    pluginData: {
+                        importer: args.path,
+                    },
+                    loader: 'text',
+                };
+            });
+        },
+    };
+};
+
 const getLibMainFileWebpackRelative = (libName: string) => {
     const mask = {
         'react': './node_modules/react/index.js',

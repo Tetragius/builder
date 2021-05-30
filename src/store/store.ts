@@ -17,7 +17,7 @@ const initStore: IStore = {
         workplace: {
             viewAll: true,
             currentScreenId: null,
-            currentFileId: null,
+            currentFile: null,
             isDragMode: false,
             tabs: []
         }

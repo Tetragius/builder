@@ -18,16 +18,16 @@ import { styleFormatter } from "../../../utils/styleFormatter";
 
 export const _Wrapper = (props: any) => {
 
-  let { itemId, nowrap, onDragStart, onDragEnd, onDragOver, onDrop, ...forwardProps } = props;
+  let { item, nowrap, onDragStart, onDragEnd, onDragOver, onDrop, ...forwardProps } = props;
 
   const {
     store,
     state
   } = useRaxy<IStore>((store) => ({
-    item: store.project.structure.find(item => item.id === itemId),
-    get selected() { return store.project.selected === this.item },
-    get hovered() { return store.project.hovered === this.item },
-    get code() { return getCode(this.item.name) },
+    item,
+    selected: store.project.selected === item,
+    hovered: store.project.hovered === item,
+    code: getCode(item.name),
     structure: store.project.structure,
     isDragMode: store.flags.workplace.isDragMode,
   }), {
@@ -36,7 +36,6 @@ export const _Wrapper = (props: any) => {
   });
 
   const { selected, hovered, structure, code, isDragMode } = state;
-  const item: IComponent = state.item;
   const { props: componentProps, style: componentStyle, ...meta } = item;
 
   nowrap = props.nowrap ?? meta.nowrap;
@@ -63,7 +62,7 @@ export const _Wrapper = (props: any) => {
         children = componentChildren.map((child, idx) => {
 
           if (typeof child === 'object') {
-            return <Wrapper key={idx} itemId={child.id} nowrap={nowrapChildren} />;
+            return <Wrapper key={idx} item={child} nowrap={nowrapChildren} />;
           }
 
           return child;
@@ -84,10 +83,10 @@ export const _Wrapper = (props: any) => {
     componentSlots.forEach((slot) => {
       const slotsChildren = (structure as IComponent[]).filter(item => item.parentId === slot.id);
       if (!slotsChildren.length) {
-        result[slot.name] = <Wrapper key={slot.id} itemId={slot.id} />
+        result[slot.name] = <Wrapper key={slot.id} item={slot} />
       }
       else {
-        result[slot.name] = <>{slotsChildren.map(child => <Wrapper key={child.id} itemId={child.id} />)}</>
+        result[slot.name] = <>{slotsChildren.map(child => <Wrapper key={child.id} item={child} />)}</>
       }
     });
     return result;
@@ -177,6 +176,8 @@ export const _Wrapper = (props: any) => {
   }, []);
   //
 
+  const style: any = styleFormatter(componentStyle)[0];
+
   if (!nowrap) {
     return (
       <Box
@@ -194,10 +195,14 @@ export const _Wrapper = (props: any) => {
         isDragMode={isDragMode}
         resizable={resizable}
         name={item.name}
-        style={styleFormatter(componentStyle)}
+        style={style}
       >
         <Suspense fallback={''}>
-          <Instanse {...forwardProps} {...extractProps(componentProps)} {...constructSlots()}>
+          <Instanse
+            {...forwardProps}
+            {...extractProps(componentProps)}
+            {...constructSlots()}
+            style={{ width: style.width, height: style.height }}>
             {constructChildren()}
           </Instanse>
         </Suspense>

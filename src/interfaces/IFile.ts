@@ -5,4 +5,5 @@ export interface IFile {
     isFolder: boolean;
     editable: boolean;
     isOpen: boolean;
+    type?: 'text' | 'image' | 'folder'
 }

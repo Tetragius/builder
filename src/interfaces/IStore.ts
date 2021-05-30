@@ -15,7 +15,7 @@ interface IUIFlags {
     workplace: {
         viewAll: boolean;
         currentScreenId: string | null;
-        currentFileId: string | null;
+        currentFile: IFile | null;
         isDragMode: boolean;
         tabs: any[]
     }

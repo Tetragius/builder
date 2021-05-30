@@ -6,7 +6,7 @@ import { IInstanseType } from "../interfaces/IINstanseType";
 import { defaultStyle } from "../store/meta/style";
 import { cloneObject } from "../utils/cloneObject";
 
-const basicProjectStructure: IProjectStructure = [
+const basicProjectStructure = (): IProjectStructure => [
   {
     path: '',
     name: 'webpack.config.js',
@@ -94,9 +94,9 @@ const basicProjectStructure: IProjectStructure = [
     path: '',
     name: 'package.json',
     content: `{
-      "name": "${name}",
+      "name": "${store.project.name}",
       "version": "1.0.0",
-      "description": "${name}",
+      "description": "${store.project.name}",
       "main": "src/index.ts",
       "scripts": {
         "start": "webpack serve",
@@ -194,9 +194,13 @@ export const createEmptyLayer = (name: string, type: IInstanseType) => {
     `${name}.styled.tsx`,
     false,
     `import styled from 'styled-components';
-      // [[styled:start]]
-      export const Box = styled.div\`\`;
-      // [[styled:end]]`)
+
+    // [[styled:imports]]
+    // [[styled:imports]]
+
+    // [[styled:start]]
+    export const Box = styled.div\`\`;
+    // [[styled:end]]`)
 
   appendFileSystemItem(
     `/src/${type}s/${name}`,
@@ -213,7 +217,7 @@ export const createEmptyLayer = (name: string, type: IInstanseType) => {
 
     export const ${name} = (props) => {
 
-        const {children, ...attrs} = props;
+        const {children, /*[[slots-const:start]]*/ /*[[slots-const:end]]*/ ...attrs} = props;
 
         // [[slots:start]]
         // [[slots:end]]
@@ -265,7 +269,7 @@ export const baseProjectInit = async (name, isSimple) => {
   });
 
   appendFileSystemProjectRoot(name);
-  createProjectStructure(basicProjectStructure);
+  createProjectStructure(basicProjectStructure());
   createEmptyLayer('App', 'container');
 
   if (!isSimple) {

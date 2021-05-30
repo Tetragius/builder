@@ -8,7 +8,7 @@ import { dictionary } from '../../store/meta/style';
 
 const Field = ({ name }) => {
 
-    const { state: { style } } = useRaxy(store => ({
+    const { store, state: { style } } = useRaxy(store => ({
         style: (store.project.selected as IComponent).style[name],
     }));
 
@@ -17,6 +17,23 @@ const Field = ({ name }) => {
             style.value = data.value;
         }, [style]),
     )
+
+    if (style.allowAssetsUrl) {
+
+        const images = store.fileSystem.filter(file => file.type === 'image');
+
+        return <FormField style={{ width: '100%' }}>
+            <FormField.Label>{name}</FormField.Label>
+            <FormField.Content>
+                <Select
+                    size='xs'
+                    options={images}
+                    value={style.value}
+                    valueToString={(item) => item.name}
+                    onSelect={(e, data) => style.value = data?.value} />
+            </FormField.Content>
+        </FormField>
+    }
 
     if (style.values) {
         return <FormField style={{ width: '100%' }}>

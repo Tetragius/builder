@@ -1,10 +1,32 @@
+import path from 'path';
+import { IFile } from '../interfaces';
+import { uniqueId } from '../services/Core';
+import { FS } from "../services/FileSystem"; 1
 import { IStyle } from "../store/meta/style";
 import { camelToKebab } from "./camelToKebab";
 
-export const styleFormatter = (styles: IStyle) => {
+const asNoneValues = ['none', 'normal', 'unset', 'auto'];
+
+export type Importer = { importName: string, file: IFile };
+type Result = [IStyle, Importer[]]
+
+export const styleFormatter = (styles: IStyle, replaceUrls: boolean = true): Result => {
+
     const formated = {};
+    const imports: Importer[] = [];
+
     for (const style in styles) {
-        if (!styles[style].value || styles[style].value === 'none' || styles[style].value === 'normal') {
+        if (!styles[style].value || asNoneValues.includes(styles[style].value)) {
+            continue;
+        }
+        if (styles[style].allowAssetsUrl) {
+            const file = styles[style].value as IFile;
+            const url = styles[style].value ? FS.readFileSync(path.resolve(file.path, file.name)) : '';
+            const importName = `img_${uniqueId()}`;
+            formated[style] = replaceUrls ? `url(${url})` : `url(\$\{${importName}\})`;
+            if (!replaceUrls) {
+                imports.push({ importName, file: styles[style].value });
+            }
             continue;
         }
         if (!styles[style].unionName) {
@@ -26,5 +48,5 @@ export const styleFormatter = (styles: IStyle) => {
             formated['filter'] += styles[style].value ? `${camelToKebab(style)}(${styles[style].value}${styles[style].demension ?? ''}) ` : '';
         }
     }
-    return formated;
+    return [formated, imports];
 }

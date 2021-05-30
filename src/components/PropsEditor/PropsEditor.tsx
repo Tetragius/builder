@@ -72,6 +72,23 @@ export const PropsEditor = () => {
             </FormField>
         }
 
+        if (prop.allowAssetsUrl) {
+
+            const images = store.fileSystem.filter(file => file.type === 'image');
+
+            return <FormField key={key} style={{ width: '100%' }}>
+                <FormField.Label>{key}</FormField.Label>
+                <FormField.Content>
+                    <Select
+                        size='xs'
+                        options={images}
+                        value={prop.value}
+                        valueToString={(item) => item.name}
+                        onSelect={(e, data) => prop.value = data.value} />
+                </FormField.Content>
+            </FormField>
+        }
+
         if (!prop.values) {
             return <FormField key={key} style={{ width: '100%' }}>
                 <FormField.Label>{key}</FormField.Label>

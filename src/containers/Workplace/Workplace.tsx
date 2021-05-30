@@ -1,6 +1,7 @@
 import PerfectScrollbar from 'perfect-scrollbar';
 import React, { useEffect, useRef } from 'react';
 import { Code, Frame } from '../../components';
+import { ImageViewer } from '../../components/ImageViewer';
 import { useRaxy } from '../../store/store';
 import { Box, Main } from './Workplace.styles';
 
@@ -9,7 +10,7 @@ export const Workplace = () => {
     const ref = useRef<any>();
     const refPS = useRef<any>();
 
-    const { store, state: { flags: { currentScreenId, viewAll }, screens, isDirTree } } = useRaxy(store => (
+    const { store, state: { flags: { currentScreenId, currentFile, viewAll }, screens, isDirTree } } = useRaxy(store => (
         {
             flags: store.flags.workplace,
             screens: store.project.structure.filter(element => element.namespace === 'layer'),
@@ -57,7 +58,8 @@ export const Workplace = () => {
                         : layer ? <Frame key={layer.id} id={layer.id} item={layer} /> : null}
                 </Main>
             }
-            {isDirTree && <Main><Code /></Main>}
+            {isDirTree && currentFile?.type !== 'image' && <Main><Code /></Main>}
+            {isDirTree && currentFile?.type === 'image' && <Main><ImageViewer /></Main>}
         </Box>
     )
 }

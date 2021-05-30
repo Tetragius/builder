@@ -11,12 +11,12 @@ class _FS {
     this.vol = Volume.fromJSON({ '/foo': 'bar' });
   }
 
-  readFileAsync = async (path: string): Promise<any> => new Promise(resolve => {
-    const file = this.vol.readFileSync(path, 'utf8');
+  readFileAsync = async (path: string, format: BufferEncoding = 'utf8'): Promise<any> => new Promise(resolve => {
+    const file = this.vol.readFileSync(path, format);
     resolve(file);
   })
 
-  readFileSync = (path: string, format: BufferEncoding) => this.vol.readFileSync(path, format);
+  readFileSync = (path: string, format: BufferEncoding = 'utf8') => this.vol.readFileSync(path, format);
   writeFileSync = (name: string, data: string | ArrayBuffer) => this.vol.writeFileSync(name, data as string | NodeJS.ArrayBufferView);
 
   writeFileAsync = async (name: string, data: string | ArrayBuffer) => {
@@ -52,9 +52,9 @@ class _FS {
 
   //@ts-ignore
   getVol = () => this.vol.toJSON();
-  
-  setVol = (json) => this.vol.fromJSON(json);
 
+  setVol = (json) => this.vol.fromJSON(json);
 }
 
-export const FS = new _FS();
+export const FS = window.parent['fs'] ?? new _FS();
+window['fs'] = FS;

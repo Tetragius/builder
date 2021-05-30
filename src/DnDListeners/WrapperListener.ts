@@ -23,7 +23,8 @@ const createReq = (name, item, parentId) => {
 
 export const WrapperListener = (message: any) => {
     if (message?.reciever?.name === 'WRAPPER' && message?.data?.name === 'COMPONENT') {
-        const parentId = message.reciever.object.itemId;
+        const parentId = message.reciever.object.item.id;
+        console.log(parentId, message.data)
         createReq(message.data?.object.name, message.data?.object.item, parentId);
     }
 }

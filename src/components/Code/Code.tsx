@@ -6,24 +6,21 @@ import { useRaxy } from '../../store/store';
 import { FS } from '../../services/FileSystem';
 import { getFileType } from '../../utils/getFileType';
 import { prettierText } from '../../utils/prettier';
-import { IFile } from '../../interfaces';
-
 export const Code = () => {
 
     const ref = useRef<HTMLDivElement>(null);
     const editor = useRef<monaco.editor.IStandaloneCodeEditor>();
 
-    const { store: { fileSystem }, state: { currentFileId } } = useRaxy(store => ({ currentFileId: store.flags.workplace.currentFileId }));
+    const { store: { fileSystem }, state: { currentFile } } = useRaxy(store => ({ currentFile: store.flags.workplace.currentFile }));
 
     useEffect(() => {
 
-        const file = fileSystem.find(file => file.id === currentFileId) as IFile;
-        if (ref.current && file) {
+        if (ref.current && currentFile) {
 
-            const language = getFileType(file);
+            const language = getFileType(currentFile);
 
-            console.log(path.resolve(file.path, file.name))
-            const data = FS.readFileSync(path.resolve(file.path, file.name), 'utf-8');
+            console.log(path.resolve(currentFile.path, currentFile.name))
+            const data = FS.readFileSync(path.resolve(currentFile.path, currentFile.name), 'utf-8');
 
             const formated = language === 'typescript' ? prettierText(data) : data;
 
@@ -47,7 +44,7 @@ export const Code = () => {
             }
 
         }
-    }, [currentFileId])
+    }, [currentFile])
 
     return <Box ref={ref} />;
 

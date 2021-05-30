@@ -4,9 +4,8 @@ import { IComponent } from "../interfaces";
 import { instanse, store } from '../store/store';
 import { camelToKebab } from '../utils/camelToKebab';
 import { capitalizeString } from "../utils/capitalizeString";
-import { styleFormatter } from '../utils/styleFormatter';
+import { Importer, styleFormatter } from '../utils/styleFormatter';
 import { updateMetaAndExistItems } from './Core';
-
 interface IImports {
     [key: string]: IComponent
 }
@@ -15,37 +14,51 @@ interface ISlots {
     [key: string]: string
 }
 
-const objToCSS = (obj: any): string => Object.entries(obj ?? {})
-    .map((entry: any) => {
-        if (!entry[1] || entry[1] === 'none' || entry[1] === 'normal') {
-            return false;
-        }
-        return `    ${camelToKebab(entry[0])}: ${entry[1]};`;
-    })
-    .filter(Boolean)
-    .join('\n');
+const asNoneValues = ['none', 'normal', 'unset', 'auto'];
 
-const contentBuilder = (code: string, item: IComponent) => {
+const objToCSS = (obj: any, imports: Importer[]): [string, Importer[]] => {
+    const code = Object.entries(obj ?? {})
+        .map((entry: any) => {
+            if (!entry[1] || asNoneValues.includes(entry[1])) {
+                return false;
+            }
+            return `    ${camelToKebab(entry[0])}: ${entry[1]};`;
+        })
+        .filter(Boolean)
+        .join('\n');
+    return [code, imports]
+}
+
+const contentBuilder = (code: string, item: IComponent): [string, boolean, string | null] => {
     const textValue = item?.props?.$text?.value;
     if (textValue) {
         if (textValue === '$children') {
-            return `{props.children}`;
+            return [`{children}`, true, null];
         }
-        return textValue;
+        if (textValue.includes('$slot:')) {
+            const slotName = textValue.replace(/.*\:/gm, '');
+            return [`{${slotName}}`, false, slotName];
+        }
+        return [textValue, false, null];
     }
-    return code;
+    return [code, false, null];
 }
 
-const getCode = (item: IComponent, structure: IComponent[]): [IImports[], string, ISlots[], ISlots[]] => {
+const getCode = (item: IComponent, structure: IComponent[]): [IImports[], string, ISlots[], ISlots[], boolean, string[]] => {
+
     const imports: IImports[] = [];
     const slots: ISlots[] = [];
     const forwardSlots: ISlots[] = [];
+    let hasChildren: boolean = false;
+    const customSlotNames: string[] = [];
+
     let code = '';
 
     structure
         .filter(child => child.parentId === item.id)
         .forEach(child => {
-            const [_imports, _code, _slots, _forwardSolts] = getCode(child, structure);
+            const [_imports, _code, _slots, _forwardSolts, _hasChildren, _customSolotNames] = getCode(child, structure);
+            hasChildren = hasChildren || _hasChildren;
 
             if (child.isSlot) {
                 imports.push(..._imports);
@@ -55,7 +68,11 @@ const getCode = (item: IComponent, structure: IComponent[]): [IImports[], string
             else {
                 imports.push({ [child.namespace]: child }, ..._imports);
                 slots.push(..._slots);
-                const content = contentBuilder(_code, child);
+                const [content, hasChild, slotName] = contentBuilder(_code, child);
+
+                hasChildren = hasChildren || hasChild;
+
+                customSlotNames.push(slotName ?? '', ..._customSolotNames);
 
                 const componentName = child.styled ? `${capitalizeString(child.name)}_${child.id}` : child.name;
 
@@ -64,7 +81,7 @@ const getCode = (item: IComponent, structure: IComponent[]): [IImports[], string
 
         });
 
-    return [imports, code, slots, forwardSlots];
+    return [imports, code, slots, forwardSlots, hasChildren, customSlotNames];
 }
 
 const constructImports = (container: IComponent, imports: IImports[]): string => {
@@ -110,7 +127,9 @@ const constructStyledImports = (container: IComponent, imports: IImports[]): str
     return components.length && `import { ${components.join(',')} } from './${container.name}.styled.tsx';` || '';
 };
 
-const constructStyled = (container: IComponent, imports: IImports[]): string => {
+const constructStyled = (container: IComponent, imports: IImports[]): [string, string] => {
+
+    const constants: Importer[] = [];
 
     const components = imports.map<[string, IComponent]>(imp => {
         const child = Object.values(imp)[0];
@@ -124,10 +143,22 @@ const constructStyled = (container: IComponent, imports: IImports[]): string => 
     }).filter(c => c);
     if (container.styled) components.unshift(['Box', container]);
 
-    return components.reduce((result, [name, component]) => {
-        result += `export const ${name} = styled.div\`\n${objToCSS(styleFormatter(component.style))}\`;`;
+
+    const codeBlock = components.reduce((result, [name, component]) => {
+        const [cssString, imps] = objToCSS(...styleFormatter(component.style, false));
+        result += `export const ${name} = styled.div\`\n${cssString}\`;`;
+        constants.push(...imps);
         return result;
     }, '') as string;
+
+    const containerFolder = store.fileSystem.find(folder => folder.id === container.folderId);
+
+    const constatnsString = constants.reduce((result, item: Importer) => {
+        result += `import ${item.importName} from '${path.relative(`${containerFolder?.path}/${containerFolder?.name}`, `${item.file.path}/${item.file.name}`)}';`
+        return result;
+    }, '');
+
+    return [codeBlock, constatnsString];
 
 };
 
@@ -208,9 +239,9 @@ instanse.subscribe('update', async (e) => {
 
             let data = FS.readFileSync(`/${path}/${layer.name}.tsx`, 'utf-8');
 
-            const [imports, code, slots] = getCode(layer, structure);
+            const [imports, code, slots, _, hasChildren, customSlotsNames] = getCode(layer, structure);
 
-            updateMetaAndExistItems(layer, code.includes('{props.children}'));
+            updateMetaAndExistItems(layer, hasChildren, customSlotsNames);
 
             data = data.replace(/(\/\/ \[\[imports:start\]\]).*(\/\/ \[\[imports:end\]\])/gms, `$1\n${constructImports(layer, imports)}\n$2`);
             data = data.replace(/(\/\/ \[\[styled:start\]\]).*(\/\/ \[\[styled:end\]\])/gms, `$1\n${constructStyledImports(layer, imports)}\n$2`);
@@ -225,7 +256,10 @@ instanse.subscribe('update', async (e) => {
 
                 data = FS.readFileSync(`/${path}/${layer.name}.styled.tsx`, 'utf-8');
 
-                data = data.replace(/(\/\/ \[\[styled:start\]\]).*(\/\/ \[\[styled:end\]\])/gms, `$1\n${constructStyled(layer, imports)}\n$2`);
+                const [styledCssBlock, styledImportsBlock] = constructStyled(layer, imports);
+
+                data = data.replace(/(\/\/ \[\[styled:imports\]\]).*(\/\/ \[\[styled:imports\]\])/gms, `$1\n${styledImportsBlock}\n$2`);
+                data = data.replace(/(\/\/ \[\[styled:start\]\]).*(\/\/ \[\[styled:end\]\])/gms, `$1\n${styledCssBlock}\n$2`);
 
                 FS.writeFileSync(`${path}/${layer.name}.styled.tsx`, data);
 

@@ -21,10 +21,10 @@ export const _Content = ({ onDragStart, onDragEnd, onDragOver, onDrop }: any) =>
             onDragOver={onDragOver}
             onDragEnd={onDragEnd}
             onDrop={onDrop}
-            style={styled ? styleFormatter(style) : {}}
+            style={styled ? styleFormatter(style)[0] : {}}
         >
             {structure?.filter(s => s.parentId == window.frameElement?.id).map(item => (
-                <Wrapper key={item.id} itemId={item.id} />
+                <Wrapper key={item.id} item={item} />
             ))}
         </Box>
     )
