@@ -67,7 +67,7 @@ export const CreateProject = ({ isOpen, onClose }) => {
                             <FormField style={{ width: '100%' }}>
                                 <FormField.Label required>Сохраненный проект</FormField.Label>
                                 <FormField.Content>
-                                    <FileLoaderButton onChange={(e, data) => setFiles(data)} accept='.json' multiple={false}>Выбирите файл</FileLoaderButton>
+                                    <FileLoaderButton onChange={(e, data) => setFiles(data)} accept='.json' multiple={false}>Выберете файл</FileLoaderButton>
                                 </FormField.Content>
                                 {files.length ? <FormField.Message>{files[0].name}</FormField.Message> : null}
                             </FormField>
@@ -77,7 +77,7 @@ export const CreateProject = ({ isOpen, onClose }) => {
             </Modal.Body>
             <Modal.Footer>
                 {tabsValue === 'createNew' && <Button design='accent' disabled={!name} onClick={create} loading={loading}>Создать</Button>}
-                {tabsValue === 'openExists' && <Button design='accent' disabled={!files[0]?.name} onClick={open} loading={loading}>Откпыть</Button>}
+                {tabsValue === 'openExists' && <Button design='accent' disabled={!files[0]?.name} onClick={open} loading={loading}>Открыть</Button>}
             </Modal.Footer>
         </Modal.Layout>
     </Modal>
