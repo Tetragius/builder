@@ -1,110 +1,150 @@
 interface IFilter {
-    blur: any
-    brightness: any
-    contrast: any
-    grayscale: any
-    hueRotate: any
-    invert: any
-    opacity: any
-    saturate: any
-    sepia: any
+    blur: any;
+    brightness: any;
+    contrast: any;
+    grayscale: any;
+    hueRotate: any;
+    invert: any;
+    opacity: any;
+    saturate: any;
+    sepia: any;
+    url: any;
+}
+
+interface ITransform {
+    translateX: any;
+    translateY: any;
+    translateZ: any;
+    scaleX: any;
+    scaleY: any;
+    scaleZ: any;
+    skewX: any;
+    skewY: any;
+    skewZ: any;
+    rotateX: any;
+    rotateY: any;
+    rotateZ: any;
+    perspective: any;
 }
 
 export type IStyle = {
     [key in keyof Partial<CSSStyleDeclaration>]: any;
 };
 
-export const defaultStyle: IStyle & IFilter = {
-    position: { value: 'relative', values: ['absolute', 'fixed', 'relative', 'static'] },
-    left: { value: 0, demension: 'px', demensions: ['px', '%'] },
-    top: { value: 0, demension: 'px', demensions: ['px', '%'] },
-    display: { value: 'block', values: ['inline', 'inline-block', 'flex', 'inline-flex'] },
-    height: { value: 100, demension: 'px', demensions: ['px', '%'] },
-    width: { value: 100, demension: 'px', demensions: ['px', '%'] },
+export const defaultStyle: IStyle & IFilter & ITransform = {
+    position: { value: 'relative', values: ['absolute', 'fixed', 'relative', 'static'], namespace: 'basic' },
+    display: { value: 'block', values: ['block', 'inline', 'inline-block', 'flex', 'inline-flex'], namespace: 'basic' },
+    left: { value: 0, demension: 'px', demensions: ['px', '%'], namespace: 'basic' },
+    top: { value: 0, demension: 'px', demensions: ['px', '%'], namespace: 'basic' },
+    height: { value: 100, demension: 'px', demensions: ['px', '%'], namespace: 'basic' },
+    width: { value: 100, demension: 'px', demensions: ['px', '%'], namespace: 'basic' },
+    color: { value: '', dictionaryName: 'color', namespace: 'basic' },
+    cursor: { value: 'auto', values: ['auto', 'crosshair', 'default', 'e-resize', 'help', 'move', 'n-resize', 'ne-resize', 'nw-resize', 'pointer', 'progress', 's-resize', 'se-resize', 'sw-resize', 'text', 'w-resize', 'wait'], namespace: 'basic' },
+    opacity: { value: '', namespace: 'basic' },
+    fontSize: { value: '', demension: 'px', demensions: ['px', 'pt'], namespace: 'basic' },
+    lineHeight: { value: '', demension: 'px', namespace: 'basic' },
 
     //padding 
-    paddingLeft: { value: '', demension: 'px', dictionaryName: 'size' },
-    paddingTop: { value: '', demension: 'px', dictionaryName: 'size' },
-    paddingRight: { value: '', demension: 'px', dictionaryName: 'size' },
-    paddingBottom: { value: '', demension: 'px', dictionaryName: 'size' },
+    paddingLeft: { value: '', demension: 'px', dictionaryName: 'size', namespace: 'padding' },
+    paddingTop: { value: '', demension: 'px', dictionaryName: 'size', namespace: 'padding' },
+    paddingRight: { value: '', demension: 'px', dictionaryName: 'size', namespace: 'padding' },
+    paddingBottom: { value: '', demension: 'px', dictionaryName: 'size', namespace: 'padding' },
 
     //margin 
-    marginLeft: { value: '', demension: 'px', dictionaryName: 'size' },
-    marginTop: { value: '', demension: 'px', dictionaryName: 'size' },
-    marginRight: { value: '', demension: 'px', dictionaryName: 'size' },
-    marginBottom: { value: '', demension: 'px', dictionaryName: 'size' },
+    marginLeft: { value: '', demension: 'px', dictionaryName: 'size', namespace: 'margin' },
+    marginTop: { value: '', demension: 'px', dictionaryName: 'size', namespace: 'margin' },
+    marginRight: { value: '', demension: 'px', dictionaryName: 'size', namespace: 'margin' },
+    marginBottom: { value: '', demension: 'px', dictionaryName: 'size', namespace: 'margin' },
 
     //oultine 
-    outlineColor: { value: '', dictionaryName: 'color' },
-    outlineStyle: { value: 'none', dictionaryName: 'border' },
-    outlineWidth: { value: '', demension: 'px', dictionaryName: 'size' },
-    outlineOffset: { value: '', demension: 'px', dictionaryName: 'size' },
+    outlineColor: { value: '', dictionaryName: 'color', namespace: 'outline' },
+    outlineStyle: { value: 'none', dictionaryName: 'border', namespace: 'outline' },
+    outlineWidth: { value: '', demension: 'px', dictionaryName: 'size', namespace: 'outline' },
+    outlineOffset: { value: '', demension: 'px', dictionaryName: 'size', namespace: 'outline' },
 
     //border 
-    borderWidth: { value: '', demension: 'px', dictionaryName: 'size' },
-    borderLeftWidth: { value: '', demension: 'px', dictionaryName: 'size' },
-    borderTopWidth: { value: '', demension: 'px', dictionaryName: 'size' },
-    borderRightWidth: { value: '', demension: 'px', dictionaryName: 'size' },
-    borderBottomWidth: { value: '', demension: 'px', dictionaryName: 'size' },
+    borderWidth: { value: '', demension: 'px', dictionaryName: 'size', namespace: 'border-width' },
+    borderLeftWidth: { value: '', demension: 'px', dictionaryName: 'size', namespace: 'border-width' },
+    borderTopWidth: { value: '', demension: 'px', dictionaryName: 'size', namespace: 'border-width' },
+    borderRightWidth: { value: '', demension: 'px', dictionaryName: 'size', namespace: 'border-width' },
+    borderBottomWidth: { value: '', demension: 'px', dictionaryName: 'size', namespace: 'border-width' },
 
-    borderStyle: { value: 'none', dictionaryName: 'border' },
-    borderLeftStyle: { value: 'none', dictionaryName: 'border' },
-    borderTopStyle: { value: 'none', dictionaryName: 'border' },
-    borderRightStyle: { value: 'none', dictionaryName: 'border' },
-    borderBottomStyle: { value: 'none', dictionaryName: 'border' },
+    borderStyle: { value: 'none', dictionaryName: 'border', namespace: 'border-style' },
+    borderLeftStyle: { value: 'none', dictionaryName: 'border', namespace: 'border-style' },
+    borderTopStyle: { value: 'none', dictionaryName: 'border', namespace: 'border-style' },
+    borderRightStyle: { value: 'none', dictionaryName: 'border', namespace: 'border-style' },
+    borderBottomStyle: { value: 'none', dictionaryName: 'border', namespace: 'border-style' },
 
-    borderColor: { value: '', dictionaryName: 'color' },
-    borderLeftColor: { value: '', dictionaryName: 'color' },
-    borderTopColor: { value: '', dictionaryName: 'color' },
-    borderRightColor: { value: '', dictionaryName: 'color' },
-    borderBottomColor: { value: '', dictionaryName: 'color' },
+    borderColor: { value: '', dictionaryName: 'color', namespace: 'border-color' },
+    borderLeftColor: { value: '', dictionaryName: 'color', namespace: 'border-color' },
+    borderTopColor: { value: '', dictionaryName: 'color', namespace: 'border-color' },
+    borderRightColor: { value: '', dictionaryName: 'color', namespace: 'border-color' },
+    borderBottomColor: { value: '', dictionaryName: 'color', namespace: 'border-color' },
 
-    borderRadius: { value: '', demension: 'px', dictionaryName: 'size' },
-    borderTopLeftRadius: { value: '', demension: 'px', dictionaryName: 'size' },
-    borderTopRightRadius: { value: '', demension: 'px', dictionaryName: 'size' },
-    borderBottomLeftRadius: { value: '', demension: 'px', dictionaryName: 'size' },
-    borderBottomRightRadius: { value: '', demension: 'px', dictionaryName: 'size' },
+    borderRadius: { value: '', demension: 'px', dictionaryName: 'size', namespace: 'border-radius' },
+    borderTopLeftRadius: { value: '', demension: 'px', dictionaryName: 'size', namespace: 'border-radius' },
+    borderTopRightRadius: { value: '', demension: 'px', dictionaryName: 'size', namespace: 'border-radius' },
+    borderBottomLeftRadius: { value: '', demension: 'px', dictionaryName: 'size', namespace: 'border-radius' },
+    borderBottomRightRadius: { value: '', demension: 'px', dictionaryName: 'size', namespace: 'border-radius' },
 
-    borderImageSource: { value: '', allowAssetsUrl: true },
-    borderImageRepeat: { value: '', values: ['space', 'repeat', 'round', 'stretch', 'revert', 'none'] },
-    borderImageWidth: { value: '', demension: 'px', dictionaryName: 'size' },
-    borderImageSlice: { value: '' },
+    borderImageSource: { value: '', allowAssetsUrl: true, namespace: 'border-image' },
+    borderImageRepeat: { value: '', values: ['space', 'repeat', 'round', 'stretch', 'revert', 'none'], namespace: 'border-image' },
+    borderImageWidth: { value: '', demension: 'px', dictionaryName: 'size', namespace: 'border-image' },
+    borderImageSlice: { value: '', namespace: 'border-image' },
 
     //background
-    backgroundColor: { value: '', dictionaryName: 'color' },
-    backgroundImage: { value: '', allowAssetsUrl: true },
-    backgroundSize: { value: 'auto', values: ['auto', 'cover', 'contain', 'revert'] },
-    backgroundPosition: { value: 'unset', values: ['left', 'top', 'center', 'right', 'bottom', 'revert', 'unset'] },
-    backgroundRepeat: { value: 'none', values: ['no-repeat', 'repeat', 'repeat-x', 'repeat-y', 'none'] },
+    backgroundColor: { value: '', dictionaryName: 'color', namespace: 'background' },
+    backgroundImage: { value: '', allowAssetsUrl: true, namespace: 'background' },
+    backgroundSize: { value: 'auto', values: ['auto', 'cover', 'contain', 'revert'], namespace: 'background' },
+    backgroundPosition: { value: 'unset', values: ['left', 'top', 'center', 'right', 'bottom', 'revert', 'unset'], namespace: 'background' },
+    backgroundRepeat: { value: 'none', values: ['no-repeat', 'repeat', 'repeat-x', 'repeat-y', 'none'], namespace: 'background' },
 
     //common
-    boxShadow: { value: '' },
-    boxSizing: { value: 'border-box', values: ['content-box', 'border-box', 'padding-box'] },
-    color: { value: '', dictionaryName: 'color' },
-    fontSize: { value: '', demension: 'px', demensions: ['px', 'pt'] },
-    lineHeight: { value: '', demension: 'px' },
-    alignItems: { value: 'normal', values: ['center', 'start', 'end', 'flex-start', 'flex-end', 'left', 'right', 'baseline', 'first baseline', 'last baseline', 'space-between', 'space-around', 'space-evenly', 'stretch', 'safe center', 'unsafe center', 'unset', 'normal'] },
-    justifyContent: { value: 'normal', values: ['center', 'start', 'end', 'flex-start', 'flex-end', 'left', 'right', 'baseline', 'first baseline', 'last baseline', 'space-between', 'space-around', 'space-evenly', 'stretch', 'safe center', 'unsafe center', 'unset', 'normal'] },
-    flexDirection: { value: 'row', values: ['row', 'column'] },
-    flexWrap: { value: '', values: ['wrap', 'nowrap', 'wrap-reverse', ''] },
-    cursor: { value: 'auto', values: ['auto', 'crosshair', 'default', 'e-resize', 'help', 'move', 'n-resize', 'ne-resize', 'nw-resize', 'pointer', 'progress', 's-resize', 'se-resize', 'sw-resize', 'text', 'w-resize', 'wait'] },
-    opacity: { value: '' },
+    boxShadow: { value: '', namespace: 'box' },
+    boxSizing: { value: 'border-box', values: ['content-box', 'border-box', 'padding-box'], namespace: 'box' },
+
+    alignItems: { value: 'normal', values: ['center', 'start', 'end', 'flex-start', 'flex-end', 'left', 'right', 'baseline', 'first baseline', 'last baseline', 'space-between', 'space-around', 'space-evenly', 'stretch', 'safe center', 'unsafe center', 'unset', 'normal'], namespace: 'flex' },
+    justifyContent: { value: 'normal', values: ['center', 'start', 'end', 'flex-start', 'flex-end', 'left', 'right', 'baseline', 'first baseline', 'last baseline', 'space-between', 'space-around', 'space-evenly', 'stretch', 'safe center', 'unsafe center', 'unset', 'normal'], namespace: 'flex' },
+    flexDirection: { value: 'row', values: ['row', 'column'], namespace: 'flex' },
+    flexWrap: { value: '', values: ['wrap', 'nowrap', 'wrap-reverse', ''], namespace: 'flex' },
+
     // textOverflow: { value: '', values: ['clip', 'elipsis'] },
     // overflow: { value: 'auto', values: ['hidden', 'scroll', 'auto'] },
     // whiteSpace: { value: 'normal', values: ['normal', 'nowrap', 'pre', 'pre-line', 'pre-wrap'] },
 
     //filters
-    blur: { value: '', demension: 'px', unionName: 'filter' },
-    brightness: { value: '', unionName: 'filter' },
-    contrast: { value: '', demension: '%', unionName: 'filter' },
-    grayscale: { value: '', demension: '%', unionName: 'filter' },
-    hueRotate: { value: '', demension: 'deg', unionName: 'filter' },
-    invert: { value: '', demension: '%', unionName: 'filter' },
-    saturate: { value: '', demension: '%', unionName: 'filter' },
-    sepia: { value: '', demension: '%', unionName: 'filter' },
+    blur: { value: '', demension: 'px', unionName: 'filter', namespace: 'filters' },
+    brightness: { value: '', unionName: 'filter', namespace: 'filters' },
+    contrast: { value: '', demension: '%', unionName: 'filter', namespace: 'filters' },
+    grayscale: { value: '', demension: '%', unionName: 'filter', namespace: 'filters' },
+    hueRotate: { value: '', demension: 'deg', unionName: 'filter', namespace: 'filters' },
+    invert: { value: '', demension: '%', unionName: 'filter', namespace: 'filters' },
+    saturate: { value: '', demension: '%', unionName: 'filter', namespace: 'filters' },
+    sepia: { value: '', demension: '%', unionName: 'filter', namespace: 'filters' },
+    url: { value: '', demension: '', allowAssetsUrl: true, unionName: 'filter', namespace: 'filters' },
+
+    //filters
+    translateX: { value: '', demension: 'px', unionName: 'transform', namespace: 'transform' },
+    translateY: { value: '', demension: 'px', unionName: 'transform', namespace: 'transform' },
+    translateZ: { value: '', demension: 'px', unionName: 'transform', namespace: 'transform' },
+
+    scaleX: { value: '', unionName: 'transform', namespace: 'transform' },
+    scaleY: { value: '', unionName: 'transform', namespace: 'transform' },
+    scaleZ: { value: '', unionName: 'transform', namespace: 'transform' },
+
+    skewX: { value: '', demension: 'deg', unionName: 'transform', namespace: 'transform' },
+    skewY: { value: '', demension: 'deg', unionName: 'transform', namespace: 'transform' },
+    skewZ: { value: '', demension: 'deg', unionName: 'transform', namespace: 'transform' },
+
+    rotateX: { value: '', demension: 'deg', unionName: 'transform', namespace: 'transform' },
+    rotateY: { value: '', demension: 'deg', unionName: 'transform', namespace: 'transform' },
+    rotateZ: { value: '', demension: 'deg', unionName: 'transform', namespace: 'transform' },
+
+    perspective: { value: '', demension: 'px', unionName: 'transform', namespace: 'transform' },
 }
 
 const color = {
+    "transparent": 'transparent',
     "brand-accent": "#FEE600",
     "brand-onAccent": "#FED500",
     "brand-primary": "#2B2D33",
@@ -180,6 +220,8 @@ const color = {
 };
 
 const size = {
+    "auto": 'auto',
+    "none": 'none',
     "s1": 4,
     "s2": 8,
     "s3": 12,

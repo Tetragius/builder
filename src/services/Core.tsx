@@ -10,6 +10,7 @@ import { FS } from "./FileSystem";
 import { IProjectStructure } from "../interfaces/IProjectStructure";
 import { defaultStyle } from "../store/meta/style";
 import { cloneObject } from "../utils/cloneObject";
+import { Monaco } from "./Monaco";
 
 const takeElementFromLib = (lib: any, name: any) => {
     return name?.split(".")
@@ -74,7 +75,6 @@ export const createSlot = (name: string, parentId: string): IComponent => {
         isSlot: true,
         parentId,
         nowrap: false,
-        nowrapChildren: true,
         resizable: 'none'
     }
 }
@@ -119,6 +119,7 @@ export const removeFile = (item: IFile) => {
     const remIdxs = getRemIdxsFile(item);
 
     remIdxs.sort((a, b) => b - a).forEach(idx => {
+        Monaco.removeModel(store.fileSystem[idx]);
         store.fileSystem.splice(idx, 1);
     });
 }
@@ -157,7 +158,7 @@ export const appendFileSystemItem = (dir: string, name: string, isFolder?: boole
 
     const id = uniqueId();
 
-    store.fileSystem.push({
+    const file: IFile = {
         id,
         name: `${name}`,
         isFolder: isFolder ?? false,
@@ -165,7 +166,11 @@ export const appendFileSystemItem = (dir: string, name: string, isFolder?: boole
         editable: false,
         isOpen: false,
         type: isFolder ? 'folder' : 'text'
-    });
+    };
+
+    store.fileSystem.push(file);
+
+    Monaco.createModel(file);
 
     return id;
 }
@@ -185,7 +190,7 @@ export const removeChildren = (item: IComponent) => {
 }
 
 export const updateMetaAndExistItems = (layer: IComponent, hasChildren: boolean, slots: string[]) => {
-    
+
     if (hasChildren && !store.meta[layer.name].allowChildren) {
 
         store.meta[layer.name].allowChildren = 'all';

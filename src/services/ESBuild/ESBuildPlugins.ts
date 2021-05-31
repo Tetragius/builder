@@ -8,15 +8,29 @@ const namespace = 'virtual';
 
 const resolve = ({ id, importer }: { id: string; importer: string; }) => {
     let resolvedPath = id;
+    
     if (importer && id.startsWith('.')) {
         resolvedPath = path.resolve(path.dirname(importer), id);
     }
-    for (const x of ['', '.ts', '.js', '.css']) {
+
+    
+    for (const x of ['.ts', '.js', '.tsx', '.jsx']) {
+        const realPath = resolvedPath + '/index' + x;
+        if (FS.existsSync(realPath)) {
+            return realPath;
+        }
+    
+    }
+    
+    for (const x of ['', '.ts', '.js', '.css', '.tsx', '.jsx']) {
         const realPath = resolvedPath + x;
         if (FS.existsSync(realPath)) {
             return realPath;
         }
+    
     }
+
+
     throw new Error(`${resolvedPath} not exists`);
 }
 

@@ -7,7 +7,6 @@ export const metaViennaUi: IMeta = {
         toolIcon: 'Card',
         resizable: 'none',
         nowrap: true,
-        nowrapChildren: true,
         props: {
             $text: { value: '' },
             title: {
@@ -23,7 +22,6 @@ export const metaViennaUi: IMeta = {
         toolIcon: 'Groups',
         resizable: 'none',
         nowrap: true,
-        nowrapChildren: true,
         props: {
             size: {
                 value: 'm', values: ['xxl', 'xl', 'l', 'm', 's', 'xs', 'xxs'],
@@ -41,7 +39,6 @@ export const metaViennaUi: IMeta = {
         defaultChildren: ['FormField.Label', 'FormField.Content', 'FormField.Message'],
         resizable: 'none',
         nowrap: true,
-        nowrapChildren: true,
     },
     'FormField.Label': {
         namespace: 'vienna-ui',
@@ -49,7 +46,6 @@ export const metaViennaUi: IMeta = {
         allowChildren: 'string',
         resizable: 'none',
         nowrap: true,
-        nowrapChildren: true,
         props: {
             $text: { value: '' },
             required: { value: false, values: [true, false] },
@@ -61,7 +57,6 @@ export const metaViennaUi: IMeta = {
         allowChildren: 'all',
         resizable: 'none',
         nowrap: true,
-        nowrapChildren: true,
     },
     'FormField.Message': {
         namespace: 'vienna-ui',
@@ -69,7 +64,6 @@ export const metaViennaUi: IMeta = {
         allowChildren: 'string',
         resizable: 'none',
         nowrap: true,
-        nowrapChildren: true,
         props: {
             $text: { value: '' },
             color: { value: 'normal', values: ['normal', 'warning', 'critical'] },
@@ -83,7 +77,6 @@ export const metaViennaUi: IMeta = {
         defaultChildren: ['Grid.Col'],
         resizable: 'none',
         nowrap: true,
-        nowrapChildren: true,
         props: {
             align: { value: false, values: ['left', 'center', 'right', 'around', 'between', 'stretch', false] },
             valign: { value: false, values: ['top', 'middle', 'bottom', false] },
@@ -97,7 +90,6 @@ export const metaViennaUi: IMeta = {
         allowChildren: 'all',
         resizable: 'none',
         nowrap: true,
-        nowrapChildren: true,
         props: {
             size: { value: 'auto', values: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 'auto'] },
             offset: { value: 0, values: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] },
@@ -108,14 +100,12 @@ export const metaViennaUi: IMeta = {
         nowrap: true,
         toolIcon: 'Header',
         nowrap: true,
-        nowrapChildren: true,
         resizable: 'none',
     },
     'Sidebar': {
         namespace: 'vienna-ui',
         toolIcon: 'Sidebar',
         nowrap: true,
-        nowrapChildren: true,
         resizable: 'none',
     },
     'Button': {
@@ -136,7 +126,6 @@ export const metaViennaUi: IMeta = {
             square: { value: false, values: [true, false] },
         },
         nowrap: true,
-        nowrapChildren: true,
     },
     'Input': {
         namespace: 'vienna-ui',
@@ -164,7 +153,6 @@ export const metaViennaUi: IMeta = {
         },
         slots: ['prefix', 'postfix'],
         nowrap: true,
-        nowrapChildren: true,
     },
     'InputPassword': {
         namespace: 'vienna-ui',
@@ -191,7 +179,6 @@ export const metaViennaUi: IMeta = {
             invalid: { value: false, values: [true, false] },
         },
         nowrap: true,
-        nowrapChildren: true,
     },
     'InputSlider': {
         namespace: 'vienna-ui',
@@ -218,7 +205,6 @@ export const metaViennaUi: IMeta = {
             invalid: { value: false, values: [true, false] },
         },
         nowrap: true,
-        nowrapChildren: true,
     },
     'InputPhone': {
         namespace: 'vienna-ui',
@@ -245,7 +231,6 @@ export const metaViennaUi: IMeta = {
             invalid: { value: false, values: [true, false] },
         },
         nowrap: true,
-        nowrapChildren: true,
     },
     'Textarea': {
         namespace: 'vienna-ui',
@@ -266,7 +251,6 @@ export const metaViennaUi: IMeta = {
             invalid: { value: false, values: [true, false] },
         },
         nowrap: true,
-        nowrapChildren: true,
     },
     'Radio': {
         namespace: 'vienna-ui',
@@ -282,7 +266,6 @@ export const metaViennaUi: IMeta = {
             invalid: { value: false, values: [true, false] },
         },
         nowrap: true,
-        nowrapChildren: true,
     },
     'Checkbox': {
         namespace: 'vienna-ui',
@@ -298,7 +281,6 @@ export const metaViennaUi: IMeta = {
             invalid: { value: false, values: [true, false] },
         },
         nowrap: true,
-        nowrapChildren: true,
     },
     'Switcher': {
         namespace: 'vienna-ui',
@@ -313,7 +295,6 @@ export const metaViennaUi: IMeta = {
             disabled: { value: false, values: [true, false] },
         },
         nowrap: true,
-        nowrapChildren: true,
     },
     'Calendar': {
         namespace: 'vienna-ui',
@@ -321,7 +302,6 @@ export const metaViennaUi: IMeta = {
         toolIcon: 'Calendar',
         resizable: 'none',
         nowrap: true,
-        nowrapChildren: true,
     },
     'Datepicker': {
         namespace: 'vienna-ui',
@@ -339,7 +319,6 @@ export const metaViennaUi: IMeta = {
             invalid: { value: false, values: [true, false] },
         },
         nowrap: true,
-        nowrapChildren: true,
     },
     'Select': {
         namespace: 'vienna-ui',
@@ -347,7 +326,6 @@ export const metaViennaUi: IMeta = {
         toolIcon: 'Select',
         resizable: 'none',
         nowrap: true,
-        nowrapChildren: true,
     },
     'Select.Option': {
         namespace: 'vienna-ui',
@@ -358,7 +336,6 @@ export const metaViennaUi: IMeta = {
         toolIcon: 'Select',
         resizable: 'none',
         nowrap: true,
-        nowrapChildren: true,
     },
     'Tooltip': {
         namespace: 'vienna-ui',
@@ -376,7 +353,6 @@ export const metaViennaUi: IMeta = {
             truncate: { value: false, values: [true, false] }
         },
         nowrap: true,
-        nowrapChildren: true,
     },
     'Heading': {
         namespace: 'vienna-ui',
@@ -397,7 +373,6 @@ export const metaViennaUi: IMeta = {
             uppercase: { value: false, values: [true, false] }
         },
         nowrap: true,
-        nowrapChildren: true,
     },
     'Text': {
         namespace: 'vienna-ui',
@@ -418,7 +393,6 @@ export const metaViennaUi: IMeta = {
             uppercase: { value: false, values: [true, false] }
         },
         nowrap: true,
-        nowrapChildren: true,
     },
     'Badge': {
         namespace: 'vienna-ui',
@@ -433,7 +407,6 @@ export const metaViennaUi: IMeta = {
             color: { value: 'paris10', values: ["paris10", "paris30", "miami10", "miami30", "dubai10", "dubai30", "nice10", "nice30", "seattle05", "seattle10"] }
         },
         nowrap: true,
-        nowrapChildren: true,
     },
     'Spinner': {
         namespace: 'vienna-ui',
@@ -447,7 +420,6 @@ export const metaViennaUi: IMeta = {
             position: { value: 'relative', values: ['relative', 'absolute'] }
         },
         nowrap: true,
-        nowrapChildren: true,
     },
     'Progressbar': {
         namespace: 'vienna-ui',
@@ -464,7 +436,6 @@ export const metaViennaUi: IMeta = {
             loading: { value: false, values: [true, false] }
         },
         nowrap: true,
-        nowrapChildren: true,
     },
     'Alert': {
         namespace: 'vienna-ui',
@@ -480,7 +451,6 @@ export const metaViennaUi: IMeta = {
             noIcon: { value: false, values: [true, false] }
         },
         nowrap: true,
-        nowrapChildren: true,
     },
     'Tabs': {
         namespace: 'vienna-ui',
@@ -499,7 +469,6 @@ export const metaViennaUi: IMeta = {
             resizeble: { value: false, values: [true, false] },
         },
         nowrap: true,
-        nowrapChildren: true,
     },
     'Tabs.Tab': {
         namespace: 'vienna-ui',
@@ -513,7 +482,6 @@ export const metaViennaUi: IMeta = {
             disabled: { value: false, values: [true, false] }
         },
         nowrap: true,
-        nowrapChildren: true,
     },
     'Modal': {
         namespace: 'vienna-ui',
@@ -524,7 +492,6 @@ export const metaViennaUi: IMeta = {
             isOpen: { value: true, values: [true, false] },
         },
         resizable: 'none',
-        nowrapChildren: true
     },
     'Modal.Layout': {
         namespace: 'vienna-ui',
@@ -533,7 +500,6 @@ export const metaViennaUi: IMeta = {
         defaultChildren: ['Modal.Head', 'Modal.Body', 'Modal.Footer'],
         resizable: 'none',
         nowrap: true,
-        nowrapChildren: true,
     },
     'Modal.Head': {
         namespace: 'vienna-ui',
@@ -542,7 +508,6 @@ export const metaViennaUi: IMeta = {
         defaultChildren: ['Modal.Title'],
         resizable: 'none',
         nowrap: true,
-        nowrapChildren: true,
     },
     'Modal.Title': {
         namespace: 'vienna-ui',
@@ -550,7 +515,6 @@ export const metaViennaUi: IMeta = {
         allowChildren: 'all',
         resizable: 'none',
         nowrap: true,
-        nowrapChildren: true,
         props: {
             $text: { value: '' },
         },
@@ -561,7 +525,6 @@ export const metaViennaUi: IMeta = {
         allowChildren: 'all',
         resizable: 'none',
         nowrap: true,
-        nowrapChildren: true,
     },
     'Modal.Footer': {
         namespace: 'vienna-ui',
@@ -569,7 +532,6 @@ export const metaViennaUi: IMeta = {
         allowChildren: 'all',
         resizable: 'none',
         nowrap: true,
-        nowrapChildren: true,
     },
     'Drawer': {
         namespace: 'vienna-ui',
@@ -581,7 +543,6 @@ export const metaViennaUi: IMeta = {
         },
         resizable: 'none',
         nowrap: true,
-        nowrapChildren: true,
     },
     'Drawer.Layout': {
         namespace: 'vienna-ui',
@@ -590,7 +551,6 @@ export const metaViennaUi: IMeta = {
         defaultChildren: ['Drawer.Head', 'Drawer.Body', 'Drawer.Footer'],
         resizable: 'none',
         nowrap: true,
-        nowrapChildren: true,
     },
     'Drawer.Head': {
         namespace: 'vienna-ui',
@@ -599,7 +559,6 @@ export const metaViennaUi: IMeta = {
         defaultChildren: ['Drawer.Title'],
         resizable: 'none',
         nowrap: true,
-        nowrapChildren: true,
     },
     'Drawer.Title': {
         namespace: 'vienna-ui',
@@ -607,7 +566,6 @@ export const metaViennaUi: IMeta = {
         allowChildren: 'all',
         resizable: 'none',
         nowrap: true,
-        nowrapChildren: true,
         props: {
             $text: { value: '' },
         },
@@ -618,7 +576,6 @@ export const metaViennaUi: IMeta = {
         allowChildren: 'all',
         resizable: 'none',
         nowrap: true,
-        nowrapChildren: true,
     },
     'Drawer.Footer': {
         namespace: 'vienna-ui',
@@ -626,7 +583,6 @@ export const metaViennaUi: IMeta = {
         allowChildren: 'all',
         resizable: 'none',
         nowrap: true,
-        nowrapChildren: true,
     },
     'Stepper': {
         namespace: 'vienna-ui',
@@ -635,7 +591,6 @@ export const metaViennaUi: IMeta = {
         defaultChildren: ['Stepper.Step'],
         resizable: 'none',
         nowrap: true,
-        nowrapChildren: true,
         props: {
             value: { value: '' },
             error: { value: '' },
@@ -653,7 +608,6 @@ export const metaViennaUi: IMeta = {
         allowChildren: 'all',
         resizable: 'none',
         nowrap: true,
-        nowrapChildren: true,
         props: {
             $text: { value: '' },
             value: { value: '' },
@@ -665,7 +619,6 @@ export const metaViennaUi: IMeta = {
         allowChildren: 'all',
         resizable: 'none',
         nowrap: true,
-        nowrapChildren: true,
         slots: ['header', 'content'],
         props: {
             header: { value: '' },
@@ -685,7 +638,6 @@ export const metaViennaUi: IMeta = {
         allowChildren: 'all',
         resizable: 'none',
         nowrap: true,
-        nowrapChildren: true,
         props: {
             header: { value: '' },
             content: { value: '' },

@@ -119,11 +119,22 @@ export const PropsEditor = () => {
     }
 
     const save = () => {
+
+        const savedMeta = Object.entries(store.meta).reduce((result, entry) => {
+            const [key, meta] = entry;
+            if (meta.namespace === 'custom') {
+                result[key] = meta;
+            }
+            return result;
+        }, {});
+
         const savedState = {
             fileSystem: store.fileSystem,
             vol: FS.getVol(),
-            project: store.project
+            project: store.project,
+            meta: savedMeta
         }
+        
         downlload(JSON.stringify(savedState), `${store.project.name}.json`, 'application/json')
     }
 

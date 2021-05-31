@@ -14,11 +14,11 @@ import ReactDOM from "react-dom";
 import { IComponent, IStore } from "../../../interfaces";
 import { extractProps, fillElement, removeElement } from "../../../services/Core";
 import { useRaxy } from "@tetragius/raxy-react";
-import { styleFormatter } from "../../../utils/styleFormatter";
+import { clearFromPositionsStyles, styleFormatter } from "../../../utils/styleFormatter";
 
 export const _Wrapper = (props: any) => {
 
-  let { item, nowrap, onDragStart, onDragEnd, onDragOver, onDrop, ...forwardProps } = props;
+  let { item, onDragStart, onDragEnd, onDragOver, onDrop, ...forwardProps } = props;
 
   const {
     store,
@@ -38,9 +38,8 @@ export const _Wrapper = (props: any) => {
   const { selected, hovered, structure, code, isDragMode } = state;
   const { props: componentProps, style: componentStyle, ...meta } = item;
 
-  nowrap = props.nowrap ?? meta.nowrap;
+  const nowrap = meta.nowrap;
   const resizable = meta.resizable;
-  const nowrapChildren = meta.nowrapChildren;
   const allowChildren = meta.allowChildren;
 
   const componentChildren = (structure as IComponent[]).filter((child: IComponent) => child.parentId === item.id && !child.isSlot);
@@ -62,7 +61,7 @@ export const _Wrapper = (props: any) => {
         children = componentChildren.map((child, idx) => {
 
           if (typeof child === 'object') {
-            return <Wrapper key={idx} item={child} nowrap={nowrapChildren} />;
+            return <Wrapper key={idx} item={child} />;
           }
 
           return child;
@@ -178,6 +177,8 @@ export const _Wrapper = (props: any) => {
 
   const style: any = styleFormatter(componentStyle)[0];
 
+
+
   if (!nowrap) {
     return (
       <Box
@@ -202,7 +203,7 @@ export const _Wrapper = (props: any) => {
             {...forwardProps}
             {...extractProps(componentProps)}
             {...constructSlots()}
-            style={{ width: style.width, height: style.height }}>
+            style={clearFromPositionsStyles(style)}>
             {constructChildren()}
           </Instanse>
         </Suspense>

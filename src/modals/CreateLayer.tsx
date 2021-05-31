@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Button, FormField, Groups, Input, Modal, Radio } from 'vienna-ui';
 import { IInstanseType } from '../interfaces/IINstanseType';
 import { createEmptyLayer } from '../presets/basicProjectPreset';
@@ -8,6 +8,10 @@ export const CreateLayer = ({ onClose, isOpen }) => {
 
     const [name, setName] = useState(``);
     const [type, setType] = useState<IInstanseType>('container');
+
+    useEffect(() => {
+        isOpen && setName('');
+    }, [isOpen])
 
     const addLayer = useCallback(() => {
 
@@ -45,7 +49,7 @@ export const CreateLayer = ({ onClose, isOpen }) => {
                 </Groups>
             </Modal.Body>
             <Modal.Footer>
-                <Button design='accent' disabled={!name && name.includes(' ')} onClick={addLayer}>Создать</Button>
+                <Button design='accent' disabled={!name || name.includes(' ')} onClick={addLayer}>Создать</Button>
             </Modal.Footer>
         </Modal.Layout>
     </Modal>

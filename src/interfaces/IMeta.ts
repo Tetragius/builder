@@ -35,7 +35,6 @@ export interface IMetaItem {
     toolIcon: string;
     resizable?: ResizeTypes;
     nowrap?: boolean;
-    nowrapChildren?: boolean;
     allowChildren?: ChildrenTypes;
     disallowChildren?: ChildrenTypes
     defaultChildren?: string[];

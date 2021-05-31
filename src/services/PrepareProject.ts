@@ -6,6 +6,7 @@ import { camelToKebab } from '../utils/camelToKebab';
 import { capitalizeString } from "../utils/capitalizeString";
 import { Importer, styleFormatter } from '../utils/styleFormatter';
 import { updateMetaAndExistItems } from './Core';
+import { Monaco } from './Monaco';
 interface IImports {
     [key: string]: IComponent
 }
@@ -101,7 +102,7 @@ const constructImports = (container: IComponent, imports: IImports[]): string =>
                 const importItem = store.project.structure.find(item => item.name === child);
                 const importFolder = store.fileSystem.find(folder => folder.id === importItem?.folderId);
                 const relative = path.relative(`${containerFolder?.path}/${containerFolder?.name}`, `${importFolder?.path}/${importFolder?.name}`);
-                result.push(`import {${child}} from '${relative}/${child}.tsx'`);
+                result.push(`import {${child}} from '${relative}/${child}'`);
             })
         }
 
@@ -124,7 +125,7 @@ const constructStyledImports = (container: IComponent, imports: IImports[]): str
     }).filter(c => c);
     if (container.styled) components.unshift('Box');
 
-    return components.length && `import { ${components.join(',')} } from './${container.name}.styled.tsx';` || '';
+    return components.length && `import { ${components.join(',')} } from './${container.name}.styled';` || '';
 };
 
 const constructStyled = (container: IComponent, imports: IImports[]): [string, string] => {
@@ -168,7 +169,7 @@ const wrapCode = (container: IComponent, code: string): string => {
         return `<Box {...attrs}>${code}</Box>`
     }
 
-    return `<>${code}</>`;
+    return `<div>${code}</div>`;
 
 };
 
@@ -249,6 +250,7 @@ instanse.subscribe('update', async (e) => {
             data = data.replace(/(\/\/ \[\[code:start\]\]).*(\/\/ \[\[code:end\]\])/gms, `$1\n${wrapCode(layer, code)}\n$2`);
 
             FS.writeFileSync(`${path}/${layer.name}.tsx`, data);
+            Monaco.updateModel(store.fileSystem.find(file => file.name === `${layer.name}.tsx`));
 
             const hasStyled = true;
 
@@ -262,6 +264,7 @@ instanse.subscribe('update', async (e) => {
                 data = data.replace(/(\/\/ \[\[styled:start\]\]).*(\/\/ \[\[styled:end\]\])/gms, `$1\n${styledCssBlock}\n$2`);
 
                 FS.writeFileSync(`${path}/${layer.name}.styled.tsx`, data);
+                Monaco.updateModel(store.fileSystem.find(file => file.name === `${layer.name}.styled.tsx`));
 
             }
         });

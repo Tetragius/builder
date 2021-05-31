@@ -165,7 +165,7 @@ const basicProjectStructure = (): IProjectStructure => [
     content: `import React from 'react';
     import ReactDOM from 'react-dom';
     import { Body } from 'vienna-ui';
-    import { App } from "./containers/App/index.ts";
+    import { App } from "./containers/App";
     ReactDOM.render(<Body><App /></Body>, document.getElementById('app'));`
   },
   {
@@ -187,7 +187,7 @@ export const createEmptyLayer = (name: string, type: IInstanseType) => {
     `/src/${type}s/${name}`,
     'index.ts',
     false,
-    `export * from './${name}.tsx';`)
+    `export * from './${name}';`)
 
   appendFileSystemItem(
     `/src/${type}s/${name}`,
@@ -209,7 +209,7 @@ export const createEmptyLayer = (name: string, type: IInstanseType) => {
     `import React from 'react';
             
     // [[styled:start]]
-    import { Box } from './${name}.styled.tsx';
+    import { Box } from './${name}.styled';
     // [[styled:end]]
 
     // [[imports:start]]
@@ -224,6 +224,7 @@ export const createEmptyLayer = (name: string, type: IInstanseType) => {
 
         return (
         // [[code:start]]
+        <div />
         // [[code:end]]
         );
     };
@@ -250,7 +251,6 @@ export const createEmptyLayer = (name: string, type: IInstanseType) => {
     toolIcon: 'Body',
     allowChildren: null,
     resizable: 'none',
-    nowrapChildren: true,
     nowrap: true,
   };
 

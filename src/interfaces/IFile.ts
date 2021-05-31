@@ -1,3 +1,4 @@
+import 'monaco-editor/monaco';
 export interface IFile {
     id: string;
     path: string;
@@ -5,5 +6,6 @@ export interface IFile {
     isFolder: boolean;
     editable: boolean;
     isOpen: boolean;
-    type?: 'text' | 'image' | 'folder'
+    type?: 'text' | 'image' | 'folder';
+    model?: monaco.editor.ITextModel;
 }

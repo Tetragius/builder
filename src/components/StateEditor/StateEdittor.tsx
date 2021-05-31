@@ -1,10 +1,11 @@
 import React, { useCallback } from 'react';
-import { Box, Color, SelectItem, Size } from './StateEditor.styles';
+import { Box, Color, SelectItem, Size, Block, BlockName } from './StateEditor.styles';
 import { FormField, Groups, Input, Select, Switcher } from 'vienna-ui';
 import { useRaxy } from '../../store/store';
 import { IComponent } from '../../interfaces';
 import useControlledInputOnChangeCursorFix from '../../utils/useControlledInputOnChangeCursorFix ';
 import { dictionary } from '../../store/meta/style';
+import { sortMetaArray } from '../../utils/sortDirArrayByName';
 
 const Field = ({ name }) => {
 
@@ -104,13 +105,35 @@ export const StateEditor = () => {
         }
     }, { selected: { ignoreTimeStamp: true } });
 
-    const style = selected?.style;
-    const keys = Object.keys(style ?? {});
+    const styles = selected?.style;
+
+    const entries = Object.entries(styles ?? {});
+
+    const separate = entries.reduce((result, entry: any) => {
+        const [key, style] = entry;
+        const namespace = style.namespace;
+        if (!result[namespace]) {
+            result[namespace] = {};
+        }
+        result[namespace][key] = style;
+        return result;
+    }, {});
+
+    const keys = Object.keys(separate);
 
     return <Box>
         <Groups design="vertical">
             <Switcher onChange={(e, data) => store.project.selected.styled = data?.value} checked={styled}>styled</Switcher>
-            {keys.map(key => <Field key={key} name={key} />)}
+            {keys.sort(sortMetaArray).map(key => {
+                const subList = separate[key];
+                const subListKeys = Object.keys(subList);
+                return (
+                    <Block key={key}>
+                        <BlockName>{key}</BlockName>
+                        {subListKeys.sort(sortMetaArray).map(subKey => <Field key={subKey} name={subKey} />)}
+                    </Block>
+                )
+            })}
         </Groups>
     </Box>
 }

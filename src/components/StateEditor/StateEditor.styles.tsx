@@ -31,3 +31,17 @@ export const Border = styled.div`
     border-width: 1px;
     border-color: black;
 `;
+
+export const Block = styled.div`
+    display: flex; 
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+    padding-bottom: 8px;
+    border-bottom: 1px solid gray;
+`;
+
+export const BlockName = styled.div`
+    margin-top: -16px;
+    margin-bottom: 8px;
+`;

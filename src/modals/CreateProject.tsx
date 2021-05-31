@@ -25,6 +25,7 @@ export const CreateProject = ({ isOpen, onClose }) => {
             setLoading(true);
             const text = await files[0].text();
             const json = JSON.parse(text);
+            store.meta = { ...store.meta, ...json.meta };
             store.project = json.project;
             store.fileSystem = json.fileSystem;
             FS.setVol(json.vol);
@@ -67,7 +68,7 @@ export const CreateProject = ({ isOpen, onClose }) => {
                             <FormField style={{ width: '100%' }}>
                                 <FormField.Label required>Сохраненный проект</FormField.Label>
                                 <FormField.Content>
-                                    <FileLoaderButton onChange={(e, data) => setFiles(data)} accept='.json' multiple={false}>Выберете файл</FileLoaderButton>
+                                    <FileLoaderButton onChange={(e, data) => setFiles(data)} accept='.json' multiple={false}>Выберите файл</FileLoaderButton>
                                 </FormField.Content>
                                 {files.length ? <FormField.Message>{files[0].name}</FormField.Message> : null}
                             </FormField>

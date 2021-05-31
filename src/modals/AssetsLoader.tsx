@@ -24,7 +24,7 @@ export const AssetsLoader = ({ isOpen, onClose }) => {
     const ref = useRef<HTMLInputElement>();
 
     useEffect(() => {
-        setFiles([]);
+        isOpen && setFiles([]);
     }, [isOpen])
 
     const loadFiles = async () => {
