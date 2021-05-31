@@ -124,23 +124,22 @@ export const defaultStyle: IStyle & IFilter & ITransform = {
     url: { value: '', demension: '', allowAssetsUrl: true, unionName: 'filter', namespace: 'filters' },
 
     //filters
-    translateX: { value: '', demension: 'px', unionName: 'transform', namespace: 'transform' },
-    translateY: { value: '', demension: 'px', unionName: 'transform', namespace: 'transform' },
-    translateZ: { value: '', demension: 'px', unionName: 'transform', namespace: 'transform' },
+    translateX: { value: '', demension: 'px', unionName: 'transform', namespace: 'transform', camelCase: true },
+    translateY: { value: '', demension: 'px', unionName: 'transform', namespace: 'transform', camelCase: true },
+    translateZ: { value: '', demension: 'px', unionName: 'transform', namespace: 'transform', camelCase: true },
 
-    scaleX: { value: '', unionName: 'transform', namespace: 'transform' },
-    scaleY: { value: '', unionName: 'transform', namespace: 'transform' },
-    scaleZ: { value: '', unionName: 'transform', namespace: 'transform' },
+    scaleX: { value: '', unionName: 'transform', namespace: 'transform', camelCase: true },
+    scaleY: { value: '', unionName: 'transform', namespace: 'transform', camelCase: true },
+    scaleZ: { value: '', unionName: 'transform', namespace: 'transform', camelCase: true },
 
-    skewX: { value: '', demension: 'deg', unionName: 'transform', namespace: 'transform' },
-    skewY: { value: '', demension: 'deg', unionName: 'transform', namespace: 'transform' },
-    skewZ: { value: '', demension: 'deg', unionName: 'transform', namespace: 'transform' },
+    skewX: { value: '', demension: 'deg', unionName: 'transform', namespace: 'transform', camelCase: true },
+    skewY: { value: '', demension: 'deg', unionName: 'transform', namespace: 'transform', camelCase: true },
 
-    rotateX: { value: '', demension: 'deg', unionName: 'transform', namespace: 'transform' },
-    rotateY: { value: '', demension: 'deg', unionName: 'transform', namespace: 'transform' },
-    rotateZ: { value: '', demension: 'deg', unionName: 'transform', namespace: 'transform' },
+    rotateX: { value: '', demension: 'deg', unionName: 'transform', namespace: 'transform', camelCase: true },
+    rotateY: { value: '', demension: 'deg', unionName: 'transform', namespace: 'transform', camelCase: true },
+    rotateZ: { value: '', demension: 'deg', unionName: 'transform', namespace: 'transform', camelCase: true },
 
-    perspective: { value: '', demension: 'px', unionName: 'transform', namespace: 'transform' },
+    perspective: { value: '', demension: 'px', unionName: 'transform', namespace: 'transform', camelCase: true },
 }
 
 const color = {

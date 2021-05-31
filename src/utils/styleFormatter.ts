@@ -37,8 +37,8 @@ export const styleFormatter = (styles: IStyle, replaceUrls: boolean = true): Res
                 formated[styles[style].unionName] = '';
             }
             const [value, importName] = extractValue(styles[style].value)
-            formated[styles[style].unionName] += value ? `${camelToKebab(style)}(${replaceUrls ? value : `\$\{${importName}\}`}${styles[style].demension ?? ''}) ` : '';
-            if (!replaceUrls) {
+            formated[styles[style].unionName] += value ? `${styles[style].camelCase ? style : camelToKebab(style)}(${replaceUrls && importName ? `\$\{${importName}\}` : value}${styles[style].demension ?? ''}) ` : '';
+            if (!replaceUrls && importName) {
                 imports.push({ importName, file: styles[style].value });
             }
             continue;
