@@ -5,15 +5,41 @@ import { getFileType } from '../utils/getFileType';
 import { prettierText } from '../utils/prettier';
 import { FS } from './FileSystem';
 
+const loadAdditionalDTS = () => {
+
+}
+
 class _Monaco {
 
     monaco = _monaco;
 
     constructor() {
+
+        this.monaco.languages.typescript.javascriptDefaults.setDiagnosticsOptions({
+            noSemanticValidation: true,
+            noSyntaxValidation: false
+        });
+
         this.monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
             jsx: this.monaco.languages.typescript.JsxEmit.React,
+            allowNonTsExtensions: true,
+            moduleResolution: this.monaco.languages.typescript.ModuleResolutionKind.NodeJs,
+            module: this.monaco.languages.typescript.ModuleKind.CommonJS,
+            noEmit: true,
+            esModuleInterop: true,
+            typeRoots: ["node_modules/@types"],
             baseUrl: './',
         });
+
+        ['react', 'react-dom', 'react-router-dom', 'styled-components'].forEach(this.loaStaticdDTS);
+
+    }
+
+    loaStaticdDTS = (libName) => {
+        const xhr = new XMLHttpRequest();
+        xhr.open('get', `/${libName}.d.ts`, false);
+        xhr.send();
+        this.monaco.languages.typescript.typescriptDefaults.addExtraLib(xhr.response, `file:///node_modules/@types/${libName}/index.d.ts`);
     }
 
     createEditor = (ref: HTMLDivElement, model?: monaco.editor.ITextModel): monaco.editor.IStandaloneCodeEditor => {
