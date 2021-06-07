@@ -15,7 +15,7 @@ interface ISlots {
     [key: string]: string
 }
 
-const asNoneValues = ['none', 'normal', 'unset', 'auto'];
+const asNoneValues = ['none', 'normal', 'unset'];
 
 const objToCSS = (obj: any, imports: Importer[]): [string, Importer[]] => {
     const code = Object.entries(obj ?? {})

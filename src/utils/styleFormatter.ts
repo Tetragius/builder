@@ -5,7 +5,7 @@ import { FS } from "../services/FileSystem"; 1
 import { IStyle } from "../store/meta/style";
 import { camelToKebab } from "./camelToKebab";
 
-const asNoneValues = ['none', 'normal', 'unset', 'auto'];
+const asNoneValues = ['none', 'normal', 'unset'];
 
 export type Importer = { importName: string, file: IFile };
 type Result = [IStyle, Importer[]]
@@ -54,7 +54,9 @@ export const styleFormatter = (styles: IStyle, replaceUrls: boolean = true): Res
         }
 
         if (!styles[style].unionName) {
-            formated[style] = `${styles[style].value}${styles[style].demension ?? ''}`;
+            const value = styles[style].value;
+            const nan = isNaN(parseInt(value));
+            formated[style] = `${value}${nan ? '' : styles[style].demension ?? ''}`;
         }
 
         //defaults

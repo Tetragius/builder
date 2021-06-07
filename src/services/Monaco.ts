@@ -5,10 +5,6 @@ import { getFileType } from '../utils/getFileType';
 import { prettierText } from '../utils/prettier';
 import { FS } from './FileSystem';
 
-const loadAdditionalDTS = () => {
-
-}
-
 class _Monaco {
 
     monaco = _monaco;
