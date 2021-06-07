@@ -1,1 +1,10 @@
 node_modules
+
+dist/**/*
+!dist/playground
+!dist/esbuild.wasm
+!dist/frame.html
+!dist/react.d.ts
+!dist/react-dom.d.ts
+!dist/react-router-dom.d.ts
+!dist/styled-component.d.ts

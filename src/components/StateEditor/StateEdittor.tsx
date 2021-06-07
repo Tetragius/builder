@@ -3,21 +3,20 @@ import { Box, Color, SelectItem, Size, Block, BlockName } from './StateEditor.st
 import { FormField, Groups, Input, Select, Switcher } from 'vienna-ui';
 import { useRaxy } from '../../store/store';
 import { IComponent } from '../../interfaces';
-import useControlledInputOnChangeCursorFix from '../../utils/useControlledInputOnChangeCursorFix ';
 import { dictionary } from '../../store/meta/style';
 import { sortMetaArray } from '../../utils/sortDirArrayByName';
 
 const Field = ({ name }) => {
 
-    const { store, state: { style } } = useRaxy(store => ({
+    const { store, state: { style, value }, updateState } = useRaxy(store => ({
         style: (store.project.selected as IComponent).style[name],
+        value: (store.project.selected as IComponent).style[name]?.value,
     }));
 
-    const handleOnChange = useControlledInputOnChangeCursorFix(
-        useCallback((e, data) => {
-            style.value = data.value;
-        }, [style]),
-    )
+    const handleOnChange = useCallback((e, data) => {
+        updateState('value', data.value, () => style.value = data.value);
+    }, [style])
+
 
     if (style.allowAssetsUrl) {
 
@@ -29,7 +28,7 @@ const Field = ({ name }) => {
                 <Select
                     size='xs'
                     options={images}
-                    value={style.value}
+                    value={value}
                     valueToString={(item) => item.name}
                     onSelect={(e, data) => style.value = data?.value} />
             </FormField.Content>
@@ -41,7 +40,7 @@ const Field = ({ name }) => {
             <FormField.Label>{name}</FormField.Label>
             <FormField.Content>
                 <FormField.Content>
-                    <Select size='xs' options={style.values} value={style.value} onSelect={(e, data) => style.value = data?.value} />
+                    <Select size='xs' options={style.values} value={value} onSelect={(e, data) => style.value = data?.value} />
                 </FormField.Content>
             </FormField.Content>
         </FormField>
@@ -54,7 +53,7 @@ const Field = ({ name }) => {
                 <FormField.Content>
                     <Select
                         size='xs'
-                        value={style.value}
+                        value={value}
                         editable
                         prefix={style.demension ?? ''}
                         onChange={(e, data) => style.value = data?.value}
@@ -87,7 +86,7 @@ const Field = ({ name }) => {
         <FormField.Content>
             <Input
                 size='xs'
-                value={style.value}
+                value={value}
                 postfix={style.demension}
                 onChange={handleOnChange}
             />

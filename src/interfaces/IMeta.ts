@@ -20,13 +20,13 @@ interface IBoolProps {
     values: [true, false];
 }
 
-type MetsPropTypes = IStringProps | IListProps | IBoolProps | undefined;
+type MetaPropTypes = IStringProps | IListProps | IBoolProps | undefined;
 
 interface IMetaStyle { }
 
-interface IMetaItemProps {
+export interface IMetaItemProps {
     $text?: IStringProps;
-    [name: string]: MetsPropTypes;
+    [name: string]: MetaPropTypes;
 }
 
 export interface IMetaItem {

@@ -9,7 +9,7 @@ import React, {
 import { Close } from 'vienna.icons';
 import { DnDHOC } from "../../../services/DnD";
 import { getCode } from "../../../services/ModuleLoader";
-import { Box, LT, LB, RT, RB, styleWithoutWrap, Delete } from "./Wrapper.styled";
+import { Box, LT, LB, RT, RB, styleWithoutWrap, Delete, Rotate } from "./Wrapper.styled";
 import ReactDOM from "react-dom";
 import { IComponent, IStore } from "../../../interfaces";
 import { extractProps, fillElement, removeElement } from "../../../services/Core";
@@ -105,32 +105,35 @@ export const _Wrapper = (props: any) => {
 
   const dragHandler = (e: any) => {
     if (store?.project.selected && drag.current) {
-      item.style.left.value = parseInt(item.style.left.value) + e.movementX;
-      item.style.top.value = parseInt(item.style.top.value) + e.movementY;
+      item.style.left.value = parseInt(item.style.left.value || 0) + e.movementX;
+      item.style.top.value = parseInt(item.style.top.value || 0) + e.movementY;
     }
   };
 
   const dragSizeHandler = (e: any) => {
     if (store?.project.selected && dragSize.current) {
       if (dragSizeTarget.current === "lt") {
-        item.style.left.value = parseInt(item.style.left.value) + e.movementX;
-        item.style.width.value = parseInt(item.style.width.value) - e.movementX;
-        item.style.top.value = parseInt(item.style.top.value) + e.movementY;
-        item.style.height.value = parseInt(item.style.height.value) - e.movementY;
+        item.style.left.value = parseInt(item.style.left.value || 0) + e.movementX;
+        item.style.width.value = parseInt(item.style.width.value || 0) - e.movementX;
+        item.style.top.value = parseInt(item.style.top.value || 0) + e.movementY;
+        item.style.height.value = parseInt(item.style.height.value || 0) - e.movementY;
       }
       if (dragSizeTarget.current === "lb") {
-        item.style.left.value = parseInt(item.style.left.value) + e.movementX;
-        item.style.width.value = parseInt(item.style.width.value) - e.movementX;
-        item.style.height.value = parseInt(item.style.height.value) + e.movementY;
+        item.style.left.value = parseInt(item.style.left.value || 0) + e.movementX;
+        item.style.width.value = parseInt(item.style.width.value || 0) - e.movementX;
+        item.style.height.value = parseInt(item.style.height.value || 0) + e.movementY;
       }
       if (dragSizeTarget.current === "rt") {
-        item.style.width.value = parseInt(item.style.width.value) + e.movementX;
-        item.style.top.value = parseInt(item.style.top.value) + e.movementY;
-        item.style.height.value = parseInt(item.style.height.value) - e.movementY;
+        item.style.width.value = parseInt(item.style.width.value || 0) + e.movementX;
+        item.style.top.value = parseInt(item.style.top.value || 0) + e.movementY;
+        item.style.height.value = parseInt(item.style.height.value || 0) - e.movementY;
       }
       if (dragSizeTarget.current === "rb") {
-        item.style.width.value = parseInt(item.style.width.value) + e.movementX;
-        item.style.height.value = parseInt(item.style.height.value) + e.movementY;
+        item.style.width.value = parseInt(item.style.width.value || 0) + e.movementX;
+        item.style.height.value = parseInt(item.style.height.value || 0) + e.movementY;
+      }
+      if (dragSizeTarget.current === "rotate") {
+        item.style.rotateZ.value = parseInt(item.style.rotateZ.value || 0) + e.movementX;
       }
     }
   };
@@ -213,7 +216,8 @@ export const _Wrapper = (props: any) => {
               <LT id="lt" onMouseDown={dragStartSizeHandler} />
               <LB id="lb" onMouseDown={dragStartSizeHandler} />
               <RT id="rt" onMouseDown={dragStartSizeHandler} />
-              <RB id="rb" onMouseDown={dragStartSizeHandler} />
+              <RB id="rb" onMouseDown={dragStartSizeHandler} />              
+              <Rotate id="rotate" onMouseDown={dragStartSizeHandler} />
               <Delete onClick={remove} ><Close /></Delete>
             </>
           )

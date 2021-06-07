@@ -45,6 +45,19 @@ export const RB = styled.div`
   cursor: pointer;
 `;
 
+export const Rotate = styled.div`
+  box-sizing: border-box;
+  position: absolute;
+  background-color: #93e41c;
+  border-radius: 16px;
+  height: 8px;
+  width: 8px;
+  left: 50%;
+  top: -16px;
+  transform: translateX(-50%);
+  cursor: pointer;
+`;
+
 export const Delete = styled.div<{ fixed?: boolean; right?: number; top?: number; }>`
   box-sizing: border-box;
   position:  ${({ fixed }) => fixed ? 'fixed' : 'absolute'};

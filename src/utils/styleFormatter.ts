@@ -78,7 +78,17 @@ export const styleFormatter = (styles: IStyle, replaceUrls: boolean = true): Res
 }
 
 export const clearFromPositionsStyles = (style) => {
-    const forbiden = ['left', 'top', 'margin', 'padding', 'border', 'outline', 'background'];
+    const forbiden = [
+        'left',
+        'top',
+        'margin',
+        'padding',
+        'border',
+        'outline',
+        'background',
+        'transform',
+        'filter'
+    ];
     return Object.entries(style).reduce((result, [key, value]) => {
         if (!forbiden.some(f => key.includes(f))) {
             result[key] = value;

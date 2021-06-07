@@ -1,13 +1,95 @@
+//@ts-nocheck
 import React, { useCallback, useState } from 'react';
 import { Box } from './PropsEditor.styles';
 import { Button, FormField, Groups, Input, Select, Switcher } from 'vienna-ui';
 import { store, useRaxy } from '../../store/store';
-import { IComponent } from '../../interfaces';
+import { IComponent, IMetaItemProps } from '../../interfaces';
 import ESService from '../../services/ESBuild/ESBuild';
 import { removeElement, removeLayer } from '../../services/Core';
 import { downlload } from '../../utils/donload';
 import { FS } from '../../services';
-import useControlledInputOnChangeCursorFix from '../../utils/useControlledInputOnChangeCursorFix ';
+
+const Field = ({ name }) => {
+
+    const { store, state: { prop, value }, updateState } = useRaxy(store => ({
+        prop: ((store.project.selected as IComponent).props as IMetaItemProps)[name],
+        value: (store.project.selected as IComponent).props[name]?.value,
+    }));
+
+    const handleOnChange = useCallback((e, data) => {
+        updateState('value', data.value, () => prop.value = data.value);
+    }, [prop])
+
+    if (name === "$text") {
+        return <FormField style={{ width: '100%' }}>
+            <FormField.Label>text</FormField.Label>
+            <FormField.Content>
+                <Select
+                    size='xs'
+                    editable
+                    options={['$children']}
+                    value={value}
+                    onSelect={(e, data) => prop.value = data.value}
+                    onChange={handleOnChange} />
+            </FormField.Content>
+        </FormField>
+    }
+
+    if (name === "$id") {
+        return <FormField style={{ width: '100%' }}>
+            <FormField.Label>id</FormField.Label>
+            <FormField.Content>
+                <Input size='xs' value={value} onChange={handleOnChange} />
+            </FormField.Content>
+        </FormField>
+    }
+
+    if (name === "$name") {
+        return <FormField style={{ width: '100%' }}>
+            <FormField.Label>id</FormField.Label>
+            <FormField.Content>
+                <Input size='xs' value={value} onChange={handleOnChange} />
+            </FormField.Content>
+        </FormField>
+    }
+
+    if (prop?.allowAssetsUrl) {
+
+        const images = store.fileSystem.filter(file => file.type === 'image');
+
+        return <FormField style={{ width: '100%' }}>
+            <FormField.Label>{name}</FormField.Label>
+            <FormField.Content>
+                <Select
+                    size='xs'
+                    options={images}
+                    value={value}
+                    valueToString={(item) => item.name}
+                    onSelect={(e, data) => prop.value = data.value} />
+            </FormField.Content>
+        </FormField>
+    }
+
+    if (!prop?.values) {
+        return <FormField style={{ width: '100%' }}>
+            <FormField.Label>{name}</FormField.Label>
+            <FormField.Content>
+                <Input size='xs' value={value} onChange={handleOnChange} />
+            </FormField.Content>
+        </FormField>
+    }
+
+    if (prop.values.length === 2 && typeof prop.values[0] === 'boolean') {
+        return <Switcher onChange={(e, data) => prop.value = data.value} checked={prop.value}>{name}</Switcher>
+    }
+
+    return <FormField style={{ width: '100%' }}>
+        <FormField.Label>{name}</FormField.Label>
+        <FormField.Content>
+            <Select size='xs' options={prop.values} value={prop.value} onSelect={(e, data) => prop.value = data.value} />
+        </FormField.Content>
+    </FormField>
+}
 
 
 export const PropsEditor = () => {
@@ -22,94 +104,6 @@ export const PropsEditor = () => {
 
     const props = selected?.props;
     const keys = Object.keys(props ?? {});
-
-    const handleOnChange = useControlledInputOnChangeCursorFix(
-        useCallback((e, data) => {
-            if (props) {
-                props[data.name].value = data.value;
-            }
-        }, [props]),
-    )
-
-    const constructProp = (key: string) => {
-        if (!props) { return null; }
-
-        const prop = props[key];
-
-        if (!prop) { return null; }
-
-        if (key === "$text") {
-            return <FormField key={key} style={{ width: '100%' }}>
-                <FormField.Label>text</FormField.Label>
-                <FormField.Content>
-                    <Select
-                        size='xs'
-                        name={key}
-                        editable
-                        options={['$children']}
-                        value={prop.value}
-                        onSelect={(e, data) => prop.value = data.value}
-                        onChange={handleOnChange} />
-                </FormField.Content>
-            </FormField>
-        }
-
-        if (key === "$id") {
-            return <FormField key={key} style={{ width: '100%' }}>
-                <FormField.Label>id</FormField.Label>
-                <FormField.Content>
-                    <Input size='xs' name={key} placeholder={selected.id} value={prop.value} onChange={handleOnChange} />
-                </FormField.Content>
-            </FormField>
-        }
-
-        if (key === "$name") {
-            return <FormField key={key} style={{ width: '100%' }}>
-                <FormField.Label>id</FormField.Label>
-                <FormField.Content>
-                    <Input size='xs' name={key} value={prop.value} onChange={handleOnChange} />
-                </FormField.Content>
-            </FormField>
-        }
-
-        if (prop.allowAssetsUrl) {
-
-            const images = store.fileSystem.filter(file => file.type === 'image');
-
-            return <FormField key={key} style={{ width: '100%' }}>
-                <FormField.Label>{key}</FormField.Label>
-                <FormField.Content>
-                    <Select
-                        size='xs'
-                        options={images}
-                        value={prop.value}
-                        valueToString={(item) => item.name}
-                        onSelect={(e, data) => prop.value = data.value} />
-                </FormField.Content>
-            </FormField>
-        }
-
-        if (!prop.values) {
-            return <FormField key={key} style={{ width: '100%' }}>
-                <FormField.Label>{key}</FormField.Label>
-                <FormField.Content>
-                    <Input size='xs' name={key} value={prop.value} onChange={handleOnChange} />
-                </FormField.Content>
-            </FormField>
-        }
-
-        if (prop.values.length === 2 && typeof prop.values[0] === 'boolean') {
-            return <Switcher key={key} onChange={(e, data) => prop.value = data.value} checked={prop.value}>{key}</Switcher>
-        }
-
-        return <FormField key={key} style={{ width: '100%' }}>
-            <FormField.Label>{key}</FormField.Label>
-            <FormField.Content>
-                <Select size='xs' options={prop.values} value={prop.value} onSelect={(e, data) => prop.value = data.value} />
-            </FormField.Content>
-        </FormField>
-
-    }
 
     const run = async () => {
         setBuildng(true);
@@ -134,7 +128,7 @@ export const PropsEditor = () => {
             project: store.project,
             meta: savedMeta
         }
-        
+
         downlload(JSON.stringify(savedState), `${store.project.name}.json`, 'application/json')
     }
 
@@ -163,7 +157,7 @@ export const PropsEditor = () => {
 
     return <Box>
         <Groups design="vertical" >
-            {keys.map(constructProp)}
+            {keys.map(subKey => <Field key={subKey} name={subKey} />)}
             {selected.namespace === 'root' && <Button design="accent" style={{ width: '100%' }} loading={building} onClick={run}>Запусить</Button>}
             {(selected.namespace === 'layer' || selected.namespace === 'root') && <Button design="accent" style={{ width: '100%' }} loading={building} onClick={build}>Собрать</Button>}
             {selected.namespace === 'root' && <Button design="primary" style={{ width: '100%' }} onClick={save}>Сохранить</Button>}
