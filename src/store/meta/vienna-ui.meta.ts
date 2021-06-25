@@ -452,37 +452,37 @@ export const metaViennaUi: IMeta = {
         },
         nowrap: true,
     },
-    'Tabs': {
-        namespace: 'vienna-ui',
-        toolIcon: 'Tabs',
-        allowChildren: ['Tabs.Tab'],
-        defaultChildren: ['Tabs.Tab'],
-        resizable: 'none',
-        props: {
-            design: {
-                value: 'accent', values: ['accent', 'primary'],
-            },
-            size: {
-                value: 'm', values: ["s", "m", "l"],
-            },
-            value: { value: '' },
-            resizeble: { value: false, values: [true, false] },
-        },
-        nowrap: true,
-    },
-    'Tabs.Tab': {
-        namespace: 'vienna-ui',
-        toolIcon: 'Tabs',
-        allowChildren: 'string',
-        resizable: 'none',
-        props: {
-            $text: { value: '' },
-            value: { value: '' },
-            active: { value: false, values: [true, false] },
-            disabled: { value: false, values: [true, false] }
-        },
-        nowrap: true,
-    },
+    // 'Tabs': {
+    //     namespace: 'vienna-ui',
+    //     toolIcon: 'Tabs',
+    //     allowChildren: ['Tabs.Tab'],
+    //     defaultChildren: ['Tabs.Tab'],
+    //     resizable: 'none',
+    //     props: {
+    //         design: {
+    //             value: 'accent', values: ['accent', 'primary'],
+    //         },
+    //         size: {
+    //             value: 'm', values: ["s", "m", "l"],
+    //         },
+    //         value: { value: '' },
+    //         resizeble: { value: false, values: [true, false] },
+    //     },
+    //     nowrap: true,
+    // },
+    // 'Tabs.Tab': {
+    //     namespace: 'vienna-ui',
+    //     toolIcon: 'Tabs',
+    //     allowChildren: 'string',
+    //     resizable: 'none',
+    //     props: {
+    //         $text: { value: '' },
+    //         value: { value: '' },
+    //         active: { value: false, values: [true, false] },
+    //         disabled: { value: false, values: [true, false] }
+    //     },
+    //     nowrap: true,
+    // },
     'Modal': {
         namespace: 'vienna-ui',
         toolIcon: 'Modal',
@@ -584,35 +584,35 @@ export const metaViennaUi: IMeta = {
         resizable: 'none',
         nowrap: true,
     },
-    'Stepper': {
-        namespace: 'vienna-ui',
-        toolIcon: 'Stepper',
-        allowChildren: ['Stepper.Step'],
-        defaultChildren: ['Stepper.Step'],
-        resizable: 'none',
-        nowrap: true,
-        props: {
-            value: { value: '' },
-            error: { value: '' },
-            valign: { value: 'center', values: ['top', 'center'] },
-            responsive: { value: true, values: [true, false] },
-            orientation: { value: 'horizontal', values: ['horizontal', 'vertical'] },
-            size: {
-                value: 's', values: ["s", "l"],
-            }
-        },
-    },
-    'Stepper.Step': {
-        namespace: 'vienna-ui',
-        toolIcon: 'Stepper',
-        allowChildren: 'all',
-        resizable: 'none',
-        nowrap: true,
-        props: {
-            $text: { value: '' },
-            value: { value: '' },
-        },
-    },
+    // 'Stepper': {
+    //     namespace: 'vienna-ui',
+    //     toolIcon: 'Stepper',
+    //     allowChildren: ['Stepper.Step'],
+    //     defaultChildren: ['Stepper.Step'],
+    //     resizable: 'none',
+    //     nowrap: true,
+    //     props: {
+    //         value: { value: '' },
+    //         error: { value: '' },
+    //         valign: { value: 'center', values: ['top', 'center'] },
+    //         responsive: { value: true, values: [true, false] },
+    //         orientation: { value: 'horizontal', values: ['horizontal', 'vertical'] },
+    //         size: {
+    //             value: 's', values: ["s", "l"],
+    //         }
+    //     },
+    // },
+    // 'Stepper.Step': {
+    //     namespace: 'vienna-ui',
+    //     toolIcon: 'Stepper',
+    //     allowChildren: 'all',
+    //     resizable: 'none',
+    //     nowrap: true,
+    //     props: {
+    //         $text: { value: '' },
+    //         value: { value: '' },
+    //     },
+    // },
     'Hint': {
         namespace: 'vienna-ui',
         toolIcon: 'Popover',

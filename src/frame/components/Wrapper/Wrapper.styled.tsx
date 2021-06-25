@@ -58,15 +58,15 @@ export const Rotate = styled.div`
   cursor: pointer;
 `;
 
-export const Delete = styled.div<{ fixed?: boolean; right?: number; top?: number; }>`
+export const Delete = styled.div`
   box-sizing: border-box;
-  position:  ${({ fixed }) => fixed ? 'fixed' : 'absolute'};
+  position: absolute;
   background: black;
   color: white;
   height: 16px;
   width: 16px;
-  right: ${({ right }) => right ?? 0}px;
-  top: ${({ top }) => top ?? 0}px;
+  right: 0;
+  top: 0;
   cursor: pointer;
   opacity: 0.5;
   transition: all .2s;
@@ -85,6 +85,7 @@ export const Box = styled.div<{
   resizable?: any;
   name: string;
   isDragMode?: boolean;
+  allowChildren?: boolean;
 }>`
   box-sizing: border-box;
   display: block;
@@ -97,7 +98,7 @@ export const Box = styled.div<{
 
   ${({ selected }) => selected && "outline: 1px dashed blue!important;"}
 
-  ${({ isDragMode, name }) => isDragMode && css`
+  ${({ isDragMode, name, allowChildren }) => isDragMode && !!allowChildren && css`
     &:after {
       content: '${name}';
       position: absolute;
@@ -123,7 +124,7 @@ export const styleWithoutWrap = (element: any) => styled(element)`
   ${({ hovered }) => hovered && "outline: 1px dashed black;!important"}
   ${({ selected }) => selected && "outline: 1px dashed blue;!important"}
 
-  ${({ isDragMode, name }) => isDragMode && css`
+  ${({ isDragMode, name, allowChildren }) => isDragMode && !!allowChildren && css`
   &:after {
       content: '${name}';
       position: absolute;

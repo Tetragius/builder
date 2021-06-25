@@ -15,6 +15,21 @@ import { IComponent, IStore } from "../../../interfaces";
 import { extractProps, fillElement, removeElement } from "../../../services/Core";
 import { useRaxy } from "@tetragius/raxy-react";
 import { clearFromPositionsStyles, styleFormatter } from "../../../utils/styleFormatter";
+import { Stepper } from "vienna-ui";
+
+class WrapperClass extends React.PureComponent {
+  constructor(props) {
+    super(props);
+  }
+
+  getNode = () => {
+    return ReactDOM.findDOMNode(this);
+  }
+
+  render() {
+    return this.props.children;
+  }
+}
 
 export const _Wrapper = (props: any) => {
 
@@ -72,7 +87,6 @@ export const _Wrapper = (props: any) => {
       else {
         children = item.props?.$text?.value
       }
-
       return children || ['PLACEHOLDER'];
     }
   };
@@ -199,6 +213,7 @@ export const _Wrapper = (props: any) => {
         isDragMode={isDragMode}
         resizable={resizable}
         name={item.name}
+        allowChildren={allowChildren}
         style={style}
       >
         <Suspense fallback={''}>
@@ -216,7 +231,7 @@ export const _Wrapper = (props: any) => {
               <LT id="lt" onMouseDown={dragStartSizeHandler} />
               <LB id="lb" onMouseDown={dragStartSizeHandler} />
               <RT id="rt" onMouseDown={dragStartSizeHandler} />
-              <RB id="rb" onMouseDown={dragStartSizeHandler} />              
+              <RB id="rb" onMouseDown={dragStartSizeHandler} />
               <Rotate id="rotate" onMouseDown={dragStartSizeHandler} />
               <Delete onClick={remove} ><Close /></Delete>
             </>
@@ -226,10 +241,9 @@ export const _Wrapper = (props: any) => {
     );
   }
 
-  const element = document.getElementById(item.id);
-  const rect = element?.getBoundingClientRect();
+  const refWrapped = useRef<any>();
 
-  return <>
+  return <WrapperClass ref={it => refWrapped.current = it}>
     <Suspense fallback={''}>
       <Instanse
         id={item.id}
@@ -244,6 +258,7 @@ export const _Wrapper = (props: any) => {
         selected={selected}
         hovered={hovered}
         isDragMode={isDragMode}
+        allowChildren={allowChildren}
         name={item.name}
         {...forwardProps}
         {...extractProps(componentProps)}
@@ -251,9 +266,11 @@ export const _Wrapper = (props: any) => {
         {constructChildren()}
       </Instanse>
     </Suspense>
-    {selected && ReactDOM.createPortal(<Delete fixed top={rect?.top} right={window.innerWidth - (rect?.right ?? 0)} onClick={remove}><Close /></Delete>, document.body)}
-  </>
+    {selected && refWrapped.current && ReactDOM.createPortal(<Delete onClick={remove}><Close /></Delete>, refWrapped.current.getNode())}
+  </WrapperClass>
 
 };
 
 export const Wrapper = DnDHOC('WRAPPER', _Wrapper);
+
+Wrapper.toString = () => String(Stepper.Step);

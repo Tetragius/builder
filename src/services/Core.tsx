@@ -75,7 +75,8 @@ export const createSlot = (name: string, parentId: string): IComponent => {
         isSlot: true,
         parentId,
         nowrap: false,
-        resizable: 'none'
+        resizable: 'none',
+        allowChildren: 'all',
     }
 }
 

@@ -9,11 +9,11 @@ import { removeElement, removeLayer } from '../../services/Core';
 import { downlload } from '../../utils/donload';
 import { FS } from '../../services';
 
-const Field = ({ name }) => {
+const Field = ({ name, selected }) => {
 
-    const { store, state: { prop, value }, updateState } = useRaxy(store => ({
-        prop: ((store.project.selected as IComponent).props as IMetaItemProps)[name],
-        value: (store.project.selected as IComponent).props[name]?.value,
+    const { store, state: { prop, value }, updateState } = useRaxy(_ => ({
+        prop: selected.props[name],
+        value: selected.props[name]?.value,
     }));
 
     const handleOnChange = useCallback((e, data) => {
@@ -157,7 +157,7 @@ export const PropsEditor = () => {
 
     return <Box>
         <Groups design="vertical" >
-            {keys.map(subKey => <Field key={subKey} name={subKey} />)}
+            {keys.map(subKey => <Field key={subKey} name={subKey} selected={selected} />)}
             {selected.namespace === 'root' && <Button design="accent" style={{ width: '100%' }} loading={building} onClick={run}>Запусить</Button>}
             {(selected.namespace === 'layer' || selected.namespace === 'root') && <Button design="accent" style={{ width: '100%' }} loading={building} onClick={build}>Собрать</Button>}
             {selected.namespace === 'root' && <Button design="primary" style={{ width: '100%' }} onClick={save}>Сохранить</Button>}
