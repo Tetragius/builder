@@ -56,7 +56,7 @@ export const _DirTree = ({ path, onDragStart, onDragEnd, onDragOver, onDrop }: a
             <Dir onClick={clickHandler} tabIndex={1}>
                 <Icon>{FS.isDirectory(path) ? isOpen ? <OpenFolderIcon /> : <ClosedFolderIcon /> : <FileIcon />}</Icon>
                 <Name>{name(path) ?? 'PROJECT'}</Name>
-                {!path &&
+                {path === projectName &&
                     <Menu>
                         <Button onClick={() => setUploadModal(true)} design={'ghost'} size={'s'}><Upload size={'s'} /></Button>
                         <Button onClick={downloadProject} design={'ghost'} size={'s'}><Download size={'s'} /></Button>
