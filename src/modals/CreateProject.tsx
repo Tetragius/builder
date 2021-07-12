@@ -27,7 +27,6 @@ export const CreateProject = ({ isOpen, onClose }) => {
             const json = JSON.parse(text);
             store.meta = { ...store.meta, ...json.meta };
             store.project = json.project;
-            store.fileSystem = json.fileSystem;
             FS.setVol(json.vol);
             setLoading(false);
             onClose(false);

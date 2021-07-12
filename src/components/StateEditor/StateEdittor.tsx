@@ -20,14 +20,14 @@ const Field = ({ name }) => {
 
     if (style.allowAssetsUrl) {
 
-        const images = store.fileSystem.filter(file => file.type === 'image');
+        // const images = store.fileSystem.filter(file => file.type === 'image');
 
         return <FormField style={{ width: '100%' }}>
             <FormField.Label>{name}</FormField.Label>
             <FormField.Content>
                 <Select
                     size='xs'
-                    options={images}
+                    options={[]}
                     value={value}
                     valueToString={(item) => item.name}
                     onSelect={(e, data) => style.value = data?.value} />

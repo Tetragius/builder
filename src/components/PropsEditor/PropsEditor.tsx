@@ -55,14 +55,14 @@ const Field = ({ name, selected }) => {
 
     if (prop?.allowAssetsUrl) {
 
-        const images = store.fileSystem.filter(file => file.type === 'image');
+        // const images = store.fileSystem.filter(file => file.type === 'image');
 
         return <FormField style={{ width: '100%' }}>
             <FormField.Label>{name}</FormField.Label>
             <FormField.Content>
                 <Select
                     size='xs'
-                    options={images}
+                    options={[]}
                     value={value}
                     valueToString={(item) => item.name}
                     onSelect={(e, data) => prop.value = data.value} />
@@ -123,7 +123,6 @@ export const PropsEditor = () => {
         }, {});
 
         const savedState = {
-            fileSystem: store.fileSystem,
             vol: FS.getVol(),
             project: store.project,
             meta: savedMeta

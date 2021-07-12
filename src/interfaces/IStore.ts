@@ -1,5 +1,4 @@
 import { IComponent } from "./IComponent";
-import { IFile } from "./IFile";
 import { IMeta } from "./IMeta";
 
 interface IUIFlags {
@@ -15,17 +14,18 @@ interface IUIFlags {
     workplace: {
         viewAll: boolean;
         currentScreenId: string | null;
-        currentFile: IFile | null;
+        currentFilePath: string | null;
         isDragMode: boolean;
-        tabs: any[]
+        tabs: any[],
+        openFolders: Object
     }
 }
 
 interface IProject {
     name: string;
     simpleLoading: boolean;
-    selected: IComponent | IFile;
-    hovered: IComponent | IFile;
+    selected?: IComponent | string;
+    hovered?: IComponent | string;
     structure: IComponent[];
     status: string;
 }
@@ -34,5 +34,4 @@ export interface IStore {
     meta: IMeta;
     flags: IUIFlags;
     project: IProject;
-    fileSystem: IFile[];
 }

@@ -1,4 +1,4 @@
-import { appendFileSystemItem, appendFileSystemProjectRoot, createProjectStructure, uniqueId } from "../services/Core";
+import { appendFileSystemItem, createProjectStructure, uniqueId } from "../services/Core";
 import { loadPackages } from "../services/PackagesLoader";
 import { IProjectStructure } from "../interfaces/IProjectStructure";
 import { store } from "../store/store";
@@ -181,7 +181,7 @@ const basicProjectStructure = (): IProjectStructure => [
 ]
 
 export const createEmptyLayer = (name: string, type: IInstanseType) => {
-  const folderId = appendFileSystemItem(`/src/${type}s`, name, true);
+  const path = appendFileSystemItem(`/src/${type}s`, name, true);
 
   appendFileSystemItem(
     `/src/${type}s/${name}`,
@@ -240,7 +240,7 @@ export const createEmptyLayer = (name: string, type: IInstanseType) => {
     name,
     namespace: 'layer',
     isOpen: false,
-    folderId,
+    path,
     type,
     style: { ...cloneObject(defaultStyle) }
   });
@@ -254,8 +254,6 @@ export const createEmptyLayer = (name: string, type: IInstanseType) => {
     nowrap: true,
   };
 
-  return folderId;
-
 };
 
 export const baseProjectInit = async (name, isSimple) => {
@@ -268,7 +266,6 @@ export const baseProjectInit = async (name, isSimple) => {
     isOpen: true,
   });
 
-  appendFileSystemProjectRoot(name);
   createProjectStructure(basicProjectStructure());
   createEmptyLayer('App', 'container');
 

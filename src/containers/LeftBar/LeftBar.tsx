@@ -11,17 +11,14 @@ export const LeftBar = () => {
     const ref = useRef<any>();
     const refPS = useRef<any>();
 
-    const { state: { fileSystem, flags, projectStructure } } = useRaxy(store => (
+    const { state: { flags, projectStructure } } = useRaxy(store => (
         {
-            fileSystem: store?.fileSystem,
             projectStructure: store.project.structure,
-            fileSystemLength: store?.fileSystem.length,
             projectStructureLength: store.project.structure.length,
             selectedId: store.project.selected?.id,
             flags: store.flags.leftBar
         }),
         {
-            fileSystem: { ignoreTimeStamp: true },
             projectStructure: { ignoreTimeStamp: true }
         }
     );
@@ -63,7 +60,7 @@ export const LeftBar = () => {
                 </ThemeProvider>
             </Head>
             <Content ref={ref}>
-                {dirTree && <DirTree item={fileSystem.find(item => item.path === '')} />}
+                {dirTree && <DirTree path="" />}
                 {projectTree && <ProjectTree item={projectStructure.find(item => !item.parentId)} />}
                 {componentsLibrary && <ComponentsLibrary />}
             </Content>

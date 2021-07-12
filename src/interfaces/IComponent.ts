@@ -8,6 +8,6 @@ export interface IComponent extends IMetaItem {
     styled?: boolean;
     isSlot?: boolean;
     custom?: boolean;
-    folderId?: string;
+    path?: string;
     isOpen?: boolean;
 }

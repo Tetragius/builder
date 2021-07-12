@@ -5,11 +5,11 @@ import { Box } from './ImageViewer.styles';
 
 export const ImageViewer = () => {
 
-    const { state: { image } } = useRaxy(store => ({ image: store.flags.workplace.currentFile }))
+    const { state: { imagePath } } = useRaxy(store => ({ imagePath: store.flags.workplace.currentFilePath }))
 
 
 
     return (
-        <Box url={FS.readFileSync(`${image?.path}/${image?.name}`)}></Box>
+        <Box url={FS.readFileSync(imagePath)}></Box>
     )
 }

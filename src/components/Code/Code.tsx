@@ -2,29 +2,31 @@ import React, { useEffect, useRef } from 'react';
 import { Box } from './Code.styled';
 import { useRaxy } from '../../store/store';
 import { Monaco } from '../../services/Monaco';
+import { FS } from '../../services';
 
 export const Code = () => {
 
     const ref = useRef<HTMLDivElement>(null);
     const editor = useRef<monaco.editor.IStandaloneCodeEditor>();
 
-    const { state: { currentFile } } = useRaxy(store => ({ currentFile: store.flags.workplace.currentFile }));
+    const { state: { currentFilePath } } = useRaxy(store => ({ currentFilePath: store.flags.workplace.currentFilePath }));
 
     useEffect(() => {
 
-        if (ref.current && currentFile) {
+        if (ref.current && currentFilePath && FS.isFile(currentFilePath)) {
 
-            if (editor.current && currentFile.model) {
-                editor.current.setModel(currentFile.model);
+            if (editor.current) {
+
+                editor.current.setModel(Monaco.createModel(currentFilePath));
             }
             else {
 
-                editor.current = Monaco.createEditor(ref.current, currentFile?.model);
+                editor.current = Monaco.createEditor(ref.current, Monaco.createModel(currentFilePath));
                 // editor.current.onDidChangeModelContent(e => console.log(e));
             }
 
         }
-    }, [currentFile])
+    }, [currentFilePath])
 
     return <Box ref={ref} />;
 

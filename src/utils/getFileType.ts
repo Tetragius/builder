@@ -3,10 +3,14 @@ const languages = {
     ts: 'typescript',
     js: 'javascript',
     json: 'json',
-    ejs: 'html'
+    ejs: 'html',
+    jpg: 'image',
+    jpeg: 'image',
+    png: 'image',
+    svg: 'image'
 }
 
-export const getFileType = (file) => {
-    const ext = file?.name.split('.').pop();
+export const getFileTypeByPath = (path: string) => {
+    const ext = path?.split('.').pop();
     return languages[ext ?? 'ts'];
 }

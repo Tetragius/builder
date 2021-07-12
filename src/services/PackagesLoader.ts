@@ -64,11 +64,6 @@ export const loadPackages = async (projectName: string, jsonPath?: string) => {
 
     const tarballs = await Promise.all(uniqDependencies.map(downloadDepTarball));
 
-    const nmDir = store.fileSystem.find(file => file.path === nmPath(projectName));
-    if (!nmDir) {
-        store.fileSystem.push({ id: uniqueId(), path: `/${projectName}`, name: 'node_modules', isFolder: true, editable: false, isOpen: false, type: 'folder' });
-    }
-
     return Promise.all(tarballs.map(async tarball => {
         const unziped = await untgz(tarball.blob);
 
@@ -76,25 +71,6 @@ export const loadPackages = async (projectName: string, jsonPath?: string) => {
             const filePath = file.name.replace('package', `${nmPath(projectName)}/${tarball.name}`);
             FS.mkdirSyncReqFoeFile(filePath);
             await FS.writeFileAsync(filePath, new Uint8Array(file.buffer));
-
-            const dirName = path.dirname(filePath);
-            dirName
-                .split('/')
-                .forEach((name, idx, array) => {
-                    const dirPath = array.slice(0, idx).join('/');
-                    const exists = store.fileSystem.find(file => file.path === dirPath && file.name === name);
-                    if (!exists) {
-                        store.fileSystem.push({ id: uniqueId(), name, isFolder: true, path: dirPath, editable: false, isOpen: false, type: 'folder' });
-                    }
-                })
-
-            const name = path.basename(filePath);
-
-            if (name === 'LICENSE' || /.*\..*$/gm.test(name)) {
-                store.fileSystem.push({ id: uniqueId(), name, isFolder: false, path: dirName, editable: false, isOpen: false, type: 'text' });
-            }
-
-
         }));
 
     }));

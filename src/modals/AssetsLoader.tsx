@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Button, FCCFile, FileLoader, Groups, Modal } from 'vienna-ui';
 import { FS } from '../services';
-import { uniqueId } from '../services/Core';
 import { store } from '../store/store';
 import { blobToDataURL } from '../utils/blobToDataUrl';
 import { Preview } from './Preview';
@@ -32,30 +31,12 @@ export const AssetsLoader = ({ isOpen, onClose }) => {
 
         if (!FS.existsSync(`${store.project.name}/assets`)) {
             FS.mkdirSyncReq(`${store.project.name}/assets`);
-            store.fileSystem.push({
-                id: uniqueId(),
-                path: `/${store.project.name}`,
-                name: 'assets',
-                editable: false,
-                isFolder: true,
-                isOpen: false,
-                type: 'folder'
-            })
         }
 
         await Promise.all(files.map(async file => {
             const blob = await (await fetch(file.url ?? '')).blob();
             const dataUrl = await blobToDataURL(blob);
             FS.writeFileSync(`${store.project.name}/assets/${file.name ?? ''}`, dataUrl);
-            store.fileSystem.push({
-                id: uniqueId(),
-                path: `/${store.project.name}/assets`,
-                name: file.name ?? '',
-                editable: false,
-                isFolder: false,
-                isOpen: false,
-                type: 'image'
-            })
         }));
         setLoading(false);
         onClose(false);

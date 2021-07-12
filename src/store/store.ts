@@ -17,20 +17,20 @@ const initStore: IStore = {
         workplace: {
             viewAll: true,
             currentScreenId: null,
-            currentFile: null,
+            currentFilePath: null,
             isDragMode: false,
-            tabs: []
+            tabs: [],
+            openFolders: {}
         }
     },
     project: {
         name: '',
         simpleLoading: true,
-        selected: null,
-        hovered: null,
+        selected: undefined,
+        hovered: undefined,
         structure: [],
-        status: ''
+        status: '' 
     },
-    fileSystem: []
 }
 
 export const instanse: IRaxyWithHook<IStore> = window.parent['raxyInstanse'] ?? raxyReact(initStore);

@@ -1,36 +1,19 @@
 import { DnDSinglle } from "../services/DnD"
-import { store } from "../store/store";
 import path from 'path';
-
-const checkTree = (id: string | undefined, reciever: any): boolean => {
-
-    if (!reciever.parentId) {
-        return false;
-    }
-
-    if (reciever.parentId === id) {
-        return true;
-    }
-
-    const nextReciever = store.fileSystem.find(item => item.id === reciever.parentId);
-    return checkTree(id, nextReciever);
-}
+import { FS } from "../services";
 
 export const dirTreeListener = (message: any) => {
     if (message?.reciever?.name === 'DIR_TREE') {
-        const item = store.fileSystem.find(item => item.id === message.data.object.item.id);
-        const recieverItem = store.fileSystem.find(item => item.id === message.reciever.object.item.id);
+        const itemPath = message.data.object.path;
+        const recieverPath = message.reciever.object.path;
 
-        if (checkTree(item?.id, recieverItem)) {
-            return;
-        }
-
-        if (item)
-            if (recieverItem?.isFolder) {
-                item.path = path.resolve(recieverItem.path, recieverItem.name);
+        if (itemPath)
+            if (FS.isDirectory(recieverPath)) {
+                FS.rename(itemPath, path.resolve(recieverPath, itemPath.split('/').pop()))
             }
-            else if (recieverItem) {
-                item.path = path.resolve(recieverItem.path);
+            else {
+                const dirName = path.dirname(recieverPath);
+                FS.rename(itemPath, path.resolve(dirName, itemPath.split('/').pop()))
             }
 
     }

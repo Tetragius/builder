@@ -1,62 +1,52 @@
 import React, { useCallback, useState } from 'react';
 import { Button } from 'vienna-ui';
 import { Download, Upload } from 'vienna.icons';
-import path from 'path';
 import { DnDHOC } from '../../services/DnD';
 import { useRaxy } from '../../store/store';
-import { sortDirArrayByName } from '../../utils/sortDirArrayByName';
-import { sortDirArrayByType } from '../../utils/sortDirArrayByType';
 import { Box, Dir, Icon, Name, Menu } from './DirTree.styles';
 import { ClosedFolderIcon } from './Icons/closed';
 import { FileIcon } from './Icons/file';
 import { OpenFolderIcon } from './Icons/open';
 import { zip } from '../../utils/zip';
 import { downlload } from '../../utils/donload';
-import { IFile } from '../../interfaces';
 import { ZipStatus } from '../../modals/ZipStatus';
 import { AssetsLoader } from '../../modals/AssetsLoader';
+import { FS } from '../../services';
 
-export const _DirTree = ({ item, onDragStart, onDragEnd, onDragOver, onDrop }: any) => {
+const name = (path: string) => path.split('/').pop();
 
-    const { name, isFolder, isOpen } = item as IFile;
-    const { store, state: { fileSystem, projectName } } = useRaxy(store => (
+export const _DirTree = ({ path, onDragStart, onDragEnd, onDragOver, onDrop }: any) => {
+
+    const { store, state: { projectName, isOpen } } = useRaxy(store => (
         {
-            fileSystem: store?.fileSystem,
+            isOpen: store.flags.workplace.openFolders[path],
             projectName: store?.project.name
         }));
 
     const [progress, setProgress] = useState(false);
     const [uploadModal, setUploadModal] = useState(false);
 
-    const children = store.fileSystem.reduce((o: any, i) => {
-        if (i.path === path.resolve(item.path, item.name)) {
-            o.push(i);
-        }
-        return o;
-    }, [])
-        .sort(sortDirArrayByName)
-        .sort(sortDirArrayByType);
+    const children = FS.getPathsFromFolder(path);
 
-    const clickHandler = () => {
-        if (item.isFolder) {
-            item.isOpen = !isOpen
+    const clickHandler = useCallback(() => {
+        if (FS.isDirectory(path)) {
+            store.flags.workplace.openFolders[path] = !store.flags.workplace.openFolders[path];
         }
         else {
-            store.flags.workplace.currentFile = item;
+            store.flags.workplace.currentFilePath = path;
         }
-    }
+    }, [])
 
     const downloadProject = useCallback(async () => {
         setProgress(true);
-        const buf = await zip(projectName, fileSystem);
+        const buf = await zip(projectName);
         setProgress(false);
         downlload(buf, `${projectName}.zip`, 'application/zip');
     }, [])
 
-
     return (
         <Box
-            title={name}
+            title={name(path)}
             draggable
             onDragStart={onDragStart}
             onDragEnd={onDragEnd}
@@ -64,17 +54,17 @@ export const _DirTree = ({ item, onDragStart, onDragEnd, onDragOver, onDrop }: a
             onDrop={onDrop}
         >
             <Dir onClick={clickHandler} tabIndex={1}>
-                <Icon>{isFolder ? isOpen ? <OpenFolderIcon /> : <ClosedFolderIcon /> : <FileIcon />}</Icon>
-                <Name>{name ?? 'PROJECT'}</Name>
-                {!item.path &&
-                    <Menu>                        
+                <Icon>{FS.isDirectory(path) ? isOpen ? <OpenFolderIcon /> : <ClosedFolderIcon /> : <FileIcon />}</Icon>
+                <Name>{name(path) ?? 'PROJECT'}</Name>
+                {!path &&
+                    <Menu>
                         <Button onClick={() => setUploadModal(true)} design={'ghost'} size={'s'}><Upload size={'s'} /></Button>
                         <Button onClick={downloadProject} design={'ghost'} size={'s'}><Download size={'s'} /></Button>
                     </Menu>
                 }
             </Dir>
             {
-                item.isOpen && children?.map((item: any, idx: number) => <DirTree key={idx} item={item} />)
+                isOpen && children?.map((path: any, idx: number) => <DirTree key={idx} path={path} />)
             }
             <ZipStatus isOpen={progress} />
             <AssetsLoader isOpen={uploadModal} onClose={setUploadModal} />

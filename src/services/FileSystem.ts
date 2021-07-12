@@ -1,14 +1,14 @@
 
 import './Shim';
-import { Volume } from 'memfs';
+import { Volume, IFs } from 'memfs';
 import path from 'path';
 class _FS {
 
-  vol: typeof Volume;
+  vol: IFs;
 
   constructor() {
     //@ts-ignore
-    this.vol = Volume.fromJSON({ '/foo': 'bar' });
+    this.vol = Volume.fromJSON({});
   }
 
   readFileAsync = async (path: string, format: BufferEncoding = 'utf8'): Promise<any> => new Promise(resolve => {
@@ -17,11 +17,11 @@ class _FS {
   })
 
   readFileSync = (path: string, format: BufferEncoding = 'utf8') => this.vol.readFileSync(path, format);
-  writeFileSync = (name: string, data: string | ArrayBuffer) => this.vol.writeFileSync(name, data as string | NodeJS.ArrayBufferView);
+  writeFileSync = (name: string, data: any) => this.vol.writeFileSync(name, data);
 
-  writeFileAsync = async (name: string, data: string | ArrayBuffer) => {
+  writeFileAsync = async (name: string, data: any) => {
     return new Promise(resolve => {
-      this.vol.writeFile(name, data as string | NodeJS.ArrayBufferView, resolve);
+      this.vol.writeFile(name, data, resolve);
     })
   }
 
@@ -49,6 +49,38 @@ class _FS {
   removeFolder = (path: string) => {
     this.vol.rmdirSync(path, { recursive: true });
   }
+
+  getFilesPathFromFolder = (dirPath: string): string[] =>
+    this.vol.readdirSync(dirPath)
+      .map((name) => path.join(dirPath, name))
+      .filter(filePath => this.vol.statSync(filePath).isFile());
+
+  getPathsFromFolder = (dirPath: string): string[] => {
+    const list: any = this.isDirectory(dirPath) &&
+      this.vol.readdirSync(dirPath)
+        .map(name => path.resolve(dirPath, name));
+    return list || [];
+  }
+
+  getPathsFromFolderReq = (dirPath: string): string[] => {
+    const list: string[] = [];
+    const subList: any[] = this.vol.readdirSync(dirPath);
+
+    const filesPath = subList.map(name => path.resolve(dirPath, name)).filter(path => this.vol.statSync(path).isFile());
+    const folderPath = subList.map(name => path.resolve(dirPath, name)).filter(path => !this.vol.statSync(path).isFile());
+
+    list.push(...filesPath);
+
+    folderPath.forEach(path => list.push(...this.getPathsFromFolderReq(path)));
+    return list
+
+  }
+
+  rename = (oldPath, newPath) => this.vol.renameSync(oldPath, newPath);
+
+  isFile = (path) => this.vol.statSync(path).isFile();
+
+  isDirectory = (path) => this.vol.statSync(path).isDirectory();
 
   //@ts-ignore
   getVol = () => this.vol.toJSON();

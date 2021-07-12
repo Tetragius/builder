@@ -1,13 +1,15 @@
-import path from 'path';
 import * as _monaco from 'monaco-editor';
-import { IFile } from '../interfaces';
-import { getFileType } from '../utils/getFileType';
+import { getFileTypeByPath } from '../utils/getFileType';
 import { prettierText } from '../utils/prettier';
 import { FS } from './FileSystem';
 
+interface IFileModels {
+    [x: string]: _monaco.editor.ITextModel;
+}
 class _Monaco {
 
     monaco = _monaco;
+    files: IFileModels = {};
 
     constructor() {
 
@@ -46,29 +48,27 @@ class _Monaco {
         }) as monaco.editor.IStandaloneCodeEditor;
     }
 
-    createModel = (file: IFile) => {
-        if (!file.isFolder) {
-            const language = getFileType(file);
-            const data = FS.readFileSync(path.resolve(file.path, file.name), 'utf-8');
+    createModel = (path: string) => {
+        if (!this.files[path]) {
+            const language = getFileTypeByPath(path);
+            const data = FS.readFileSync(path, 'utf-8');
             const formated = language === 'typescript' ? prettierText(data) : data;
-            file.model = this.monaco.editor.createModel(formated, 'typescript', this.monaco.Uri.parse(`file://${file.path}/${file.name}`));
-            this.monaco.editor.setModelLanguage(file.model, language);
+            this.files[path] = this.monaco.editor.createModel(formated, 'typescript', this.monaco.Uri.parse(`file://${path}`));
+            this.monaco.editor.setModelLanguage(this.files[path], language);
         }
+        return this.files[path];
     }
 
-    updateModel = (file?: IFile) => {
-        if (file && !file.isFolder) {
-            const language = getFileType(file);
-            const data = FS.readFileSync(path.resolve(file.path, file.name), 'utf-8');
-            const formated = language === 'typescript' ? prettierText(data) : data;
-            file.model?.setValue(formated);
-        }
+    updateModel = (path: string) => {
+        const language = getFileTypeByPath(path);
+        const data = FS.readFileSync(path, 'utf-8');
+        const formated = language === 'typescript' ? prettierText(data) : data;
+        this.files[path]?.setValue(formated);
     }
 
-    removeModel = (file: IFile) => {
-        if (!file.isFolder) {
-            file.model?.dispose();
-        }
+    removeModel = (path: string) => {
+        this.files[path]?.dispose();
+        delete this.files[path];
     }
 }
 

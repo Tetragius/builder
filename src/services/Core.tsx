@@ -111,69 +111,40 @@ export const removeElement = (item: IComponent) => {
     });
 }
 
-const getRemIdxsFile = (item): number[] => store.fileSystem
-    .map((i, idx) => `${i?.path}/${i?.name}`.includes(item.name) ? idx : false)
-    .filter(Boolean) as number[];
-
-
-export const removeFile = (item: IFile) => {
-    const remIdxs = getRemIdxsFile(item);
-
-    remIdxs.sort((a, b) => b - a).forEach(idx => {
-        Monaco.removeModel(store.fileSystem[idx]);
-        store.fileSystem.splice(idx, 1);
+export const removeFile = (folderPath: string) => {
+    const files = FS.getFilesPathFromFolder(folderPath);
+    files.forEach(filePath => {
+        Monaco.removeModel(filePath);
     });
 }
 
 export const removeLayer = (item: IComponent) => {
 
-    const folderId = item.folderId;
+    const path = item.path;
     const name = item.name;
 
     const remList = store.project.structure.filter(item => item.name == name);
     remList.forEach(removeElement);
 
-    const folder = store.fileSystem.find(folder => folder.id === folderId) as IFile;
-    FS.removeFolder(`${folder?.path}/${folder?.name}`);
-    removeFile(folder);
+    if (path) {
+        removeFile(path);
+        FS.removeFolder(path);
+    }
 
     delete store.meta[name];
 }
 
-export const appendFileSystemProjectRoot = (name: string) => {
-    store.fileSystem.push({
-        id: uniqueId(),
-        name: `${name}`,
-        isFolder: true,
-        path: '',
-        editable: false,
-        isOpen: true,
-        type: 'folder'
-    });
-}
-
 export const appendFileSystemItem = (dir: string, name: string, isFolder?: boolean, content?: string): string => {
     const _path = path.resolve(`./${store.project.name}`, `./${dir}`, `./${name}`);
-    isFolder ? FS.mkdirSyncReq(_path) : FS.mkdirSyncReqFoeFile(_path);
-    !isFolder && FS.writeFileSync(_path, content ?? '');
-
-    const id = uniqueId();
-
-    const file: IFile = {
-        id,
-        name: `${name}`,
-        isFolder: isFolder ?? false,
-        path: path.resolve(`./${store.project.name}`, `./${dir}`),
-        editable: false,
-        isOpen: false,
-        type: isFolder ? 'folder' : 'text'
-    };
-
-    store.fileSystem.push(file);
-
-    Monaco.createModel(file);
-
-    return id;
+    if (isFolder) {
+        FS.mkdirSyncReq(_path)
+    }
+    else {
+        FS.mkdirSyncReqFoeFile(_path);
+        FS.writeFileSync(_path, content ?? '');
+        Monaco.createModel(_path);
+    }
+    return _path;
 }
 
 export const createProjectStructure = (structure: IProjectStructure) => {

@@ -98,10 +98,10 @@ const constructImports = (container: IComponent, imports: IImports[]): string =>
         }
         else if (key === 'custom') {
             childs.forEach(child => {
-                const containerFolder = store.fileSystem.find(folder => folder.id === container.folderId);
+                const containerFolder = container.path;
                 const importItem = store.project.structure.find(item => item.name === child);
-                const importFolder = store.fileSystem.find(folder => folder.id === importItem?.folderId);
-                const relative = path.relative(`${containerFolder?.path}/${containerFolder?.name}`, `${importFolder?.path}/${importFolder?.name}`);
+                const importFolder = importItem?.path ?? '';
+                const relative = path.relative(`${containerFolder}`, `${importFolder}`);
                 result.push(`import {${child}} from '${relative}/${child}'`);
             })
         }
@@ -152,10 +152,9 @@ const constructStyled = (container: IComponent, imports: IImports[]): [string, s
         return result;
     }, '') as string;
 
-    const containerFolder = store.fileSystem.find(folder => folder.id === container.folderId);
 
     const constatnsString = constants.reduce((result, item: Importer) => {
-        result += `import ${item.importName} from '${path.relative(`${containerFolder?.path}/${containerFolder?.name}`, `${item.file.path}/${item.file.name}`)}';`
+        result += `import ${item.importName} from '${container.path}';`
         return result;
     }, '');
 
@@ -250,7 +249,7 @@ instanse.subscribe('update', async (e) => {
             data = data.replace(/(\/\/ \[\[code:start\]\]).*(\/\/ \[\[code:end\]\])/gms, `$1\n${wrapCode(layer, code)}\n$2`);
 
             FS.writeFileSync(`${path}/${layer.name}.tsx`, data);
-            Monaco.updateModel(store.fileSystem.find(file => file.name === `${layer.name}.tsx`));
+            Monaco.updateModel(`${path}/${layer.name}.tsx`);
 
             const hasStyled = true;
 
@@ -264,7 +263,7 @@ instanse.subscribe('update', async (e) => {
                 data = data.replace(/(\/\/ \[\[styled:start\]\]).*(\/\/ \[\[styled:end\]\])/gms, `$1\n${styledCssBlock}\n$2`);
 
                 FS.writeFileSync(`${path}/${layer.name}.styled.tsx`, data);
-                Monaco.updateModel(store.fileSystem.find(file => file.name === `${layer.name}.styled.tsx`));
+                Monaco.updateModel(`${path}/${layer.name}.styled.tsx`);
 
             }
         });
