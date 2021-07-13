@@ -1,9 +1,9 @@
 import { raxyReact, logger, connectDevTools, IRaxyWithHook } from '@tetragius/raxy-react';
 import { IStore } from '../interfaces';
-import { metaViennaUi, metaNative, metaReactRouter } from './meta';
+import { metaViennaUi, metaNative, metaReactRouter, metaSystem } from './meta';
 
 const initStore: IStore = {
-    meta: { ...metaViennaUi, ...metaNative, ...metaReactRouter },
+    meta: { ...metaViennaUi, ...metaNative, ...metaReactRouter, ...metaSystem },
     flags: {
         leftBar: {
             dirTree: true,
@@ -29,12 +29,18 @@ const initStore: IStore = {
         selected: undefined,
         hovered: undefined,
         structure: [],
-        status: '' 
+        status: ''
     },
 }
 
-export const instanse: IRaxyWithHook<IStore> = window.parent['raxyInstanse'] ?? raxyReact(initStore);
+export const instanse: IRaxyWithHook<IStore> = window.frameElement ? window.parent['raxyInstanse'] : window['raxyInstanse'] || raxyReact(initStore);
+
+if (!window.frameElement) {
+    window['raxyInstanse'] = instanse;
+}
+
+
 export const { store, useRaxy } = instanse;
 
-// logger(instanse.subscribe)
-// connectDevTools(instanse);
+logger(instanse.subscribe)
+connectDevTools(instanse);

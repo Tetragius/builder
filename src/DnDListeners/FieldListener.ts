@@ -22,9 +22,11 @@ const createReq = (name, item, parentId) => {
 }
 
 export const fieldListener = (message: any) => {
-    if (message?.reciever?.name === 'CONTENT' && message?.data?.name === 'COMPONENT') {
-        const parentId = window.frameElement?.id;
-        createReq(message.data?.object.name, message.data?.object.item, parentId)
+    if (message.type === 'drop' && message?.reciever?.name === 'CONTENT' && message?.data?.name === 'COMPONENT') {
+        const parentId = message.reciever?.object?.id;
+        if (parentId) {
+            createReq(message.data?.object.name, message.data?.object.item, parentId);
+        }
     }
 }
 

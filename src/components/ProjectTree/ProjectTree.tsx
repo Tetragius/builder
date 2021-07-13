@@ -25,23 +25,18 @@ const getIcon = (type: string, iconName?: any) => {
 export const _ProjectTree = ({ item, onDragStart, onDragEnd, onDragOver, onDrop }: any) => {
 
     const { name, isOpen, namespace } = item as IComponent;
-    const { store, state: { selected } } = useRaxy(store => ({
+    const { store, state: { selected, children } } = useRaxy(store => ({
         selected: store.project.selected === item,
-        ioOpen: item.isOpen
+        ioOpen: item.isOpen,
+        children: store.project.structure.filter(i => i.parentId === item.id)
     }));
 
     const [modalIsOpen, setModalIsOpen] = useState(false);
 
-    const children = store.project.structure.filter(i => {
-        return i.parentId === item.id;
-    });
-
     const clickHandlerIcon = useCallback((e) => {
         e.stopPropagation();
-        if (!!children.length) {
-            item.isOpen = !isOpen;
-        }
-    }, [isOpen])
+        item.isOpen = !!children.length ? !isOpen : false;
+    }, [isOpen, children])
 
     const clickHandler = useCallback((e) => {
         e.stopPropagation();
@@ -69,7 +64,7 @@ export const _ProjectTree = ({ item, onDragStart, onDragEnd, onDragOver, onDrop 
             <Struct selected={selected} onClick={clickHandler}>
                 <Icon onClick={clickHandlerIcon}>{isOpen ? <DownSmall size="s" /> : <RightSmall size="s" />}</Icon>
                 <Icon>{getIcon(item.type, item?.toolIcon)}</Icon>
-                <Name>{name}</Name>
+                <Name>{name}{name === 'Slot' && `:${item.props.name.value}`}</Name>
                 {!item.parentId &&
                     <Menu>
                         <Button onClick={() => setModalIsOpen(true)} design={'ghost'} size={'s'}><CardAddNew size={'s'} /></Button>

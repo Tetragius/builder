@@ -12,6 +12,7 @@ import { downlload } from '../../utils/donload';
 import { ZipStatus } from '../../modals/ZipStatus';
 import { AssetsLoader } from '../../modals/AssetsLoader';
 import { FS } from '../../services';
+import { sortDirArrayByType } from '../../utils/sortDirArrayByType';
 
 const name = (path: string) => path.split('/').pop();
 
@@ -26,7 +27,7 @@ export const _DirTree = ({ path, onDragStart, onDragEnd, onDragOver, onDrop }: a
     const [progress, setProgress] = useState(false);
     const [uploadModal, setUploadModal] = useState(false);
 
-    const children = FS.getPathsFromFolder(path);
+    const children = FS.getPathsFromFolder(path).sort(sortDirArrayByType);
 
     const clickHandler = useCallback(() => {
         if (FS.isDirectory(path)) {

@@ -24,13 +24,7 @@ const Field = ({ name, selected }) => {
         return <FormField style={{ width: '100%' }}>
             <FormField.Label>text</FormField.Label>
             <FormField.Content>
-                <Select
-                    size='xs'
-                    editable
-                    options={['$children']}
-                    value={value}
-                    onSelect={(e, data) => prop.value = data.value}
-                    onChange={handleOnChange} />
+                <Input size='xs' value={value} onChange={handleOnChange} />
             </FormField.Content>
         </FormField>
     }

@@ -56,6 +56,7 @@ module.exports = {
   devServer: {
     hot: true,
     quiet: true,
+    contentBase: path.resolve(__dirname, "dist")
   },
   watchOptions: {
     poll: true,

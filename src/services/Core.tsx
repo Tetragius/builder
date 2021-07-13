@@ -1,7 +1,7 @@
 import * as UI from "vienna-ui";
 import path from 'path';
 import * as Router from "react-router-dom";
-import { Slot } from "../frame/components";
+import * as System from "../frame/components";
 import { loadInstanse } from "./ModuleLoader";
 import { IComponent, IFile, IMetaItem } from "../interfaces";
 import React from "react";
@@ -25,10 +25,10 @@ const takeElementFromLib = (lib: any, name: any) => {
 export const getElement = async (item: IComponent): Promise<any> => {
 
     switch (true) {
-        case item.isSlot:
-            return Slot;
         case item.custom:
             return loadInstanse(item.name);
+        case item.namespace === 'system':
+            return takeElementFromLib(System, item.name);
         case item.namespace === 'native':
             return (props) => React.createElement(item.name, { ...props }, item.allowChildren ? React.Children.toArray(props.children) : null);
         case item.namespace === 'react-router-dom':
@@ -57,7 +57,7 @@ export const createComponent = (name: string, meta: IMetaItem, parentId: string)
         name,
         parentId,
         custom: meta.namespace === 'custom',
-        ...meta,
+        ...JSON.parse(JSON.stringify(meta)),
         style: { ...cloneObject(defaultStyle) },
     }
 }
@@ -69,10 +69,10 @@ export const addComponentToStore = (component: IComponent) => {
 export const createSlot = (name: string, parentId: string): IComponent => {
     return {
         id: uniqueId(),
-        namespace: '',
-        toolIcon: '',
-        name,
-        isSlot: true,
+        namespace: 'system',
+        name: 'Slot',
+        toolIcon: 'Body',
+        props: { name: { value: name } },
         parentId,
         nowrap: false,
         resizable: 'none',
@@ -189,6 +189,21 @@ export const updateMetaAndExistItems = (layer: IComponent, hasChildren: boolean,
                 removeChildren(item);
             }
         })
+    }
+
+    if (slots && (store.meta[layer.name].slots?.some(slot => !slots.includes(slot)) || slots?.some(slot => !store.meta[layer.name].slots?.includes(slot)))) {
+        store.meta[layer.name].slots = slots;
+        store.project.structure.forEach(item => {
+            if (item.name === layer.name && item.id !== layer.id) {
+                item.slots = slots;
+                store.project.structure.forEach(child => {
+                    if (child.parentId === item.id && child.name === 'Slot' && !item.slots?.includes(child.props?.name?.value)) {
+                        removeChildren(child);
+                        removeElement(child);
+                    }
+                });
+            }
+        });
     }
 
 }

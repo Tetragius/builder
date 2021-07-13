@@ -23,7 +23,8 @@ class WrapperClass extends React.PureComponent {
   }
 
   getNode = () => {
-    return ReactDOM.findDOMNode(this);
+    const node = ReactDOM.findDOMNode(this);
+    return node?.nodeType === 3 ? node.parentNode : node;
   }
 
   render() {
@@ -50,6 +51,8 @@ export const _Wrapper = (props: any) => {
     hovered: { ignoreTimeStamp: true },
   });
 
+  console.log(item);
+
   const { selected, hovered, structure, code, isDragMode } = state;
   const { props: componentProps, style: componentStyle, ...meta } = item;
 
@@ -57,8 +60,11 @@ export const _Wrapper = (props: any) => {
   const resizable = meta.resizable;
   const allowChildren = meta.allowChildren;
 
-  const componentChildren = (structure as IComponent[]).filter((child: IComponent) => child.parentId === item.id && !child.isSlot);
-  const componentSlots = (structure as IComponent[]).filter((child: IComponent) => child.parentId === item.id && child.isSlot);
+  const componentSlots = meta.slots ?? [];
+  const componentChildren = (structure as IComponent[])
+    .filter((child: IComponent) =>
+      child.parentId === item.id
+      && !(child.name === 'Slot' && componentSlots.includes(child.props?.name?.value)));
 
   const ref = useRef<HTMLElement>(null);
 
@@ -66,7 +72,7 @@ export const _Wrapper = (props: any) => {
   const dragSize = useRef(false);
   const dragSizeTarget = useRef(null);
 
-  const constructChildren = () => {
+  const constructChildren = useCallback(() => {
     if (allowChildren) {
 
       let children;
@@ -89,43 +95,45 @@ export const _Wrapper = (props: any) => {
       }
       return children || ['PLACEHOLDER'];
     }
-  };
+  }, [componentChildren, allowChildren, item]);
 
-  const constructSlots = () => {
+  const constructSlots = useCallback(() => {
     const result: any = {};
-    componentSlots.forEach((slot) => {
-      const slotsChildren = (structure as IComponent[]).filter(item => item.parentId === slot.id);
-      if (!slotsChildren.length) {
-        result[slot.name] = <Wrapper key={slot.id} item={slot} />
+    componentSlots.forEach((slotName) => {
+      const slotItem = (structure as IComponent[]).find(slot => slot.parentId === item.id && slot.props?.name?.value === slotName);
+      const slotsChildren = (structure as IComponent[]).filter(child => child.parentId === slotItem?.id);
+      if (slotItem && !slotsChildren.length) {
+        result[slotName] = <Wrapper key={slotItem?.id} item={slotItem} />
       }
       else {
-        result[slot.name] = <>{slotsChildren.map(child => <Wrapper key={child.id} item={child} />)}</>
+        result[slotName] = <>{slotsChildren.map(child => <Wrapper key={child.id} item={child} />)}</>
       }
     });
     return result;
-  }
+  }, [componentSlots, item])
 
-  const selectHandler = (e: any) => {
+  const selectHandler = useCallback((e: any) => {
     e.stopPropagation();
     store.project.selected = item;
-  };
+  }, [item]);
 
-  const hoverHandler = (e: any) => {
-    if (item.parent?.name !== 'Tooltip') {
+  const hoverHandler = useCallback((e: any) => {
+    const parent = store.project.structure.find(i => i.id === item.parentId);
+    if (parent?.name !== 'Tooltip') {
       e.stopPropagation();
     }
     store.project.hovered = item;
-  };
+  }, [item]);
 
-  const dragHandler = (e: any) => {
-    if (store?.project.selected && drag.current) {
+  const dragHandler = useCallback((e: any) => {
+    if (selected && drag.current) {
       item.style.left.value = parseInt(item.style.left.value || 0) + e.movementX;
       item.style.top.value = parseInt(item.style.top.value || 0) + e.movementY;
     }
-  };
+  }, [item, selected]);
 
-  const dragSizeHandler = (e: any) => {
-    if (store?.project.selected && dragSize.current) {
+  const dragSizeHandler = useCallback((e: any) => {
+    if (selected && dragSize.current) {
       if (dragSizeTarget.current === "lt") {
         item.style.left.value = parseInt(item.style.left.value || 0) + e.movementX;
         item.style.width.value = parseInt(item.style.width.value || 0) - e.movementX;
@@ -150,30 +158,30 @@ export const _Wrapper = (props: any) => {
         item.style.rotateZ.value = parseInt(item.style.rotateZ.value || 0) + e.movementX;
       }
     }
-  };
+  }, [item, selected]);
 
-  const removeHandlers = () => {
+  const removeHandlers = useCallback(() => {
     drag.current = false;
     dragSize.current = false;
     window.removeEventListener("mouseup", removeHandlers);
     window.removeEventListener("mousemove", dragHandler);
     window.removeEventListener("mousemove", dragSizeHandler);
-  };
+  }, [dragHandler, dragSizeHandler]);
 
-  const dragStartHandler = (e: any) => {
+  const dragStartHandler = useCallback((e: any) => {
     e.stopPropagation();
     drag.current = true;
     window.addEventListener("mouseup", removeHandlers);
     window.addEventListener("mousemove", dragHandler);
-  };
+  }, [removeHandlers, dragHandler]);
 
-  const dragStartSizeHandler = (e: any) => {
+  const dragStartSizeHandler = useCallback((e: any) => {
     e.stopPropagation();
     dragSize.current = true;
     dragSizeTarget.current = e.target.id;
     window.addEventListener("mouseup", removeHandlers);
     window.addEventListener("mousemove", dragSizeHandler);
-  };
+  }, [removeHandlers, dragSizeHandler]);
 
   useEffect(() => {
     return () => removeHandlers()
@@ -190,11 +198,15 @@ export const _Wrapper = (props: any) => {
   const remove = useCallback(() => {
     removeElement(item);
   }, []);
+
+  const mouseOutHandler = useCallback(() => {
+    if (hovered && !selected) {
+      store.project.hovered = null;
+    }
+  }, [hovered, selected]);
   //
 
   const style: any = styleFormatter(componentStyle)[0];
-
-
 
   if (!nowrap) {
     return (
@@ -203,7 +215,7 @@ export const _Wrapper = (props: any) => {
         onClick={selectHandler}
         onMouseDown={dragStartHandler}
         onMouseOver={hoverHandler}
-        onMouseOut={() => store.project.hovered = null}
+        onMouseOut={mouseOutHandler}
         onDragStart={onDragStart}
         onDragEnd={onDragEnd}
         onDragOver={_onDragOver}
@@ -242,7 +254,6 @@ export const _Wrapper = (props: any) => {
   }
 
   const refWrapped = useRef<any>();
-
   return <WrapperClass ref={it => refWrapped.current = it}>
     <Suspense fallback={''}>
       <Instanse
@@ -250,7 +261,7 @@ export const _Wrapper = (props: any) => {
         onClick={selectHandler}
         onMouseDown={dragStartHandler}
         onMouseOver={hoverHandler}
-        onMouseOut={() => store.project.hovered = null}
+        onMouseOut={mouseOutHandler}
         onDragStart={onDragStart}
         onDragEnd={onDragEnd}
         onDragOver={_onDragOver}

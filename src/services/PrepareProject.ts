@@ -33,14 +33,15 @@ const objToCSS = (obj: any, imports: Importer[]): [string, Importer[]] => {
 const contentBuilder = (code: string, item: IComponent): [string, boolean, string | null] => {
     const textValue = item?.props?.$text?.value;
     if (textValue) {
-        if (textValue === '$children') {
+        return [textValue, false, null];
+    }
+    if (item.namespace === 'system') {
+        if (item.name === 'Children') {
             return [`{children}`, true, null];
         }
-        if (textValue.includes('$slot:')) {
-            const slotName = textValue.replace(/.*\:/gm, '');
-            return [`{${slotName}}`, false, slotName];
+        if (item.name === 'Slot') {
+            return [`{${item.props?.name?.value}}`, false, item.props?.name?.value];
         }
-        return [textValue, false, null];
     }
     return [code, false, null];
 }
@@ -61,25 +62,38 @@ const getCode = (item: IComponent, structure: IComponent[]): [IImports[], string
             const [_imports, _code, _slots, _forwardSolts, _hasChildren, _customSolotNames] = getCode(child, structure);
             hasChildren = hasChildren || _hasChildren;
 
-            if (child.isSlot) {
+            if (child.name === 'Slot') {
+                const name = child.props?.name?.value;
                 imports.push(..._imports);
-                forwardSlots.push({ [`${child.name}_${child.id}`]: _code });
-                slots.push({ [`${child.name}_${child.id}`]: _code }, ..._slots);
+                forwardSlots.push({ [`${name}_${child.id}`]: _code });
+                slots.push({ [`${name}_${child.id}`]: _code }, ..._slots);
+                const [content, hasChild, slotName] = contentBuilder(_code, child);
+                hasChildren = hasChildren || hasChild;
+                if (!item.slots?.includes(child.props?.name?.value)) {
+                    customSlotNames.push(slotName ?? '', ..._customSolotNames);
+                    code += content;
+                } else {
+                    customSlotNames.push(..._customSolotNames);
+                }
             }
             else {
-                imports.push({ [child.namespace]: child }, ..._imports);
-                slots.push(..._slots);
-                const [content, hasChild, slotName] = contentBuilder(_code, child);
+                const [content, hasChild, _] = contentBuilder(_code, child);
 
                 hasChildren = hasChildren || hasChild;
 
-                customSlotNames.push(slotName ?? '', ..._customSolotNames);
-
                 const componentName = child.styled ? `${capitalizeString(child.name)}_${child.id}` : child.name;
+                customSlotNames.push(..._customSolotNames);
 
-                code += `<${componentName} id='${child.id}' ${constructProps(child.props)} ${constructSlotsProps(_forwardSolts)}${content ? ` >${content}</${componentName}>` : ' />'}`
+                if (child.namespace !== 'system') {
+                    imports.push({ [child.namespace]: child }, ..._imports);
+                    slots.push(..._slots);
+                    code += `<${componentName} id='${child.id}' ${constructProps(child.props)} ${constructSlotsProps(_forwardSolts)}${content ? ` >${content}</${componentName}>` : ' />'}`
+                }
+                else {
+                    code += content;
+                }
+
             }
-
         });
 
     return [imports, code, slots, forwardSlots, hasChildren, customSlotNames];
@@ -168,7 +182,7 @@ const wrapCode = (container: IComponent, code: string): string => {
         return `<Box {...attrs}>${code}</Box>`
     }
 
-    return `<div>${code}</div>`;
+    return `<div {...attrs}>${code}</div>`;
 
 };
 
@@ -247,6 +261,7 @@ instanse.subscribe('update', async (e) => {
             data = data.replace(/(\/\/ \[\[styled:start\]\]).*(\/\/ \[\[styled:end\]\])/gms, `$1\n${constructStyledImports(layer, imports)}\n$2`);
             data = data.replace(/(\/\/ \[\[slots:start\]\]).*(\/\/ \[\[slots:end\]\])/gms, `$1\n${constructSlots(slots)}\n$2`);
             data = data.replace(/(\/\/ \[\[code:start\]\]).*(\/\/ \[\[code:end\]\])/gms, `$1\n${wrapCode(layer, code)}\n$2`);
+            data = data.replace(/(\/\*\[\[slots-const:start\]\]\*\/).*(\/\*\[\[slots-const:end\]\]\*\/)/gms, `$1${customSlotsNames.join(',')}${customSlotsNames.length ? ',' : ''}$2`);
 
             FS.writeFileSync(`${path}/${layer.name}.tsx`, data);
             Monaco.updateModel(`${path}/${layer.name}.tsx`);

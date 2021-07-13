@@ -15,7 +15,7 @@ export const Field = () => {
         <Body>
             <Box>
                 <Global />
-                <Content />
+                <Content id={window.frameElement?.id} />
             </Box>
         </Body>
     </Raxy>
