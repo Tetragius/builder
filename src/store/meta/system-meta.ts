@@ -4,6 +4,7 @@ export const metaSystem: IMeta = {
     'Children': {
         namespace: 'system',
         toolIcon: 'Body',
+        nowrap: true,
         allowChildren: null,
         resizable: 'none',
         props: {}
@@ -11,6 +12,7 @@ export const metaSystem: IMeta = {
     'Slot': {
         namespace: 'system',
         toolIcon: 'Body',
+        nowrap: true,
         allowChildren: null,
         resizable: 'none',
         props: {
@@ -20,6 +22,7 @@ export const metaSystem: IMeta = {
     'Property': {
         namespace: 'system',
         toolIcon: 'Body',
+        nowrap: true,
         allowChildren: null,
         resizable: 'none',
         props: {
@@ -36,6 +39,13 @@ export const metaSystem: IMeta = {
         props: {
             description: { value: '' },
         }
+    },
+    'Placeholder': {
+        namespace: 'system',
+        nowrap: true,
+        toolIcon: 'Body',
+        allowChildren: 'all',
+        resizable: 'none',
     },
 };
 

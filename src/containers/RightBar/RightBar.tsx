@@ -50,14 +50,14 @@ export const RightBar = () => {
                 {namespace &&
                     <Tabs design="primary" size={'s'} value={Object.keys(flags).find(flag => flags[flag])} onChange={barToggle}>
                         {namespace && <Tabs.Tab value={'propsEditor'}><Literature size={'s'} /></Tabs.Tab>}
-                        {(namespace === 'native' || namespace === 'layer') && <Tabs.Tab value={'stateEditor'}><Picture1 size={'s'} /></Tabs.Tab>}
+                        {(namespace === 'native' || namespace === 'layer' || namespace === 'system') && <Tabs.Tab value={'stateEditor'}><Picture1 size={'s'} /></Tabs.Tab>}
                     </Tabs>
                 }
             </ThemeProvider>
         </Head>
         <Content ref={ref}>
             {namespace && propsEditor && <PropsEditor />}
-            {(namespace === 'native' || namespace === 'layer') && stateEditor && <StateEditor />}
+            {(namespace === 'native' || namespace === 'layer' || namespace === 'system') && stateEditor && <StateEditor />}
         </Content>
     </Box>
 }

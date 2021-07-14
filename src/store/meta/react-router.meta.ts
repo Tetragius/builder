@@ -4,15 +4,17 @@ export const  metaReactRouter: IMeta = {
     'HashRouter': {
         namespace: 'react-router-dom',
         allowChildren: 'all',
-        nowrap: false,
+        defaultChildren: ['Placeholder'],
+        nowrap: true,
         toolIcon: 'Body',
         resizable: 'none',
     },
     'Route': {
         namespace: 'react-router-dom',
-        nowrap: false,
+        nowrap: true,
         toolIcon: 'Body',
         allowChildren: 'all',
+        defaultChildren: ['Placeholder'],
         resizable: 'none',
         props: {
             path: { value: '/' }

@@ -84,13 +84,17 @@ const getCode = (item: IComponent, structure: IComponent[]): [IImports[], string
                 const componentName = child.styled ? `${capitalizeString(child.name)}_${child.id}` : child.name;
                 customSlotNames.push(..._customSolotNames);
 
-                if (child.namespace !== 'system') {
+                if (child.namespace !== 'system' && child.name !== 'Comment') {
                     imports.push({ [child.namespace]: child }, ..._imports);
                     slots.push(..._slots);
                     code += `<${componentName} id='${child.id}' ${constructProps(child.props)} ${constructSlotsProps(_forwardSolts)}${content ? ` >${content}</${componentName}>` : ' />'}`
                 }
                 else {
                     code += content;
+                }
+
+                if (child.namespace === 'system' && child.name === 'Placeholder') {
+                    imports.push( ..._imports);
                 }
 
             }

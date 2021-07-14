@@ -12,11 +12,10 @@ import { getCode } from "../../../services/ModuleLoader";
 import { Box, LT, LB, RT, RB, styleWithoutWrap, Delete, Rotate } from "./Wrapper.styled";
 import ReactDOM from "react-dom";
 import { IComponent, IStore } from "../../../interfaces";
-import { extractProps, fillElement, removeElement } from "../../../services/Core";
+import { extractProps, fillElement, getElement, removeElement } from "../../../services/Core";
 import { useRaxy } from "@tetragius/raxy-react";
 import { clearFromPositionsStyles, styleFormatter } from "../../../utils/styleFormatter";
-import { Stepper } from "vienna-ui";
-
+import { Placeholder } from "../Slot";
 class WrapperClass extends React.PureComponent {
   constructor(props) {
     super(props);
@@ -32,7 +31,7 @@ class WrapperClass extends React.PureComponent {
   }
 }
 
-export const _Wrapper = (props: any) => {
+export const WrapperConstructor = (props: any) => {
 
   let { item, onDragStart, onDragEnd, onDragOver, onDrop, ...forwardProps } = props;
 
@@ -51,15 +50,13 @@ export const _Wrapper = (props: any) => {
     hovered: { ignoreTimeStamp: true },
   });
 
-  console.log(item);
-
   const { selected, hovered, structure, code, isDragMode } = state;
   const { props: componentProps, style: componentStyle, ...meta } = item;
 
   const nowrap = meta.nowrap;
   const resizable = meta.resizable;
-  const allowChildren = meta.allowChildren;
 
+  const allowChildren = meta.allowChildren;
   const componentSlots = meta.slots ?? [];
   const componentChildren = (structure as IComponent[])
     .filter((child: IComponent) =>
@@ -71,6 +68,7 @@ export const _Wrapper = (props: any) => {
   const drag = useRef(false);
   const dragSize = useRef(false);
   const dragSizeTarget = useRef(null);
+  const refWrapped = useRef<any>();
 
   const constructChildren = useCallback(() => {
     if (allowChildren) {
@@ -82,6 +80,7 @@ export const _Wrapper = (props: any) => {
         children = componentChildren.map((child, idx) => {
 
           if (typeof child === 'object') {
+            const Wrapper = WrapperFactory(child);
             return <Wrapper key={idx} item={child} />;
           }
 
@@ -91,9 +90,9 @@ export const _Wrapper = (props: any) => {
 
       }
       else {
-        children = item.props?.$text?.value
+        children = item.props?.$text?.value;
       }
-      return children || ['PLACEHOLDER'];
+      return children || <Placeholder />;
     }
   }, [componentChildren, allowChildren, item]);
 
@@ -103,10 +102,14 @@ export const _Wrapper = (props: any) => {
       const slotItem = (structure as IComponent[]).find(slot => slot.parentId === item.id && slot.props?.name?.value === slotName);
       const slotsChildren = (structure as IComponent[]).filter(child => child.parentId === slotItem?.id);
       if (slotItem && !slotsChildren.length) {
+        const Wrapper = WrapperFactory(slotItem);
         result[slotName] = <Wrapper key={slotItem?.id} item={slotItem} />
       }
       else {
-        result[slotName] = <>{slotsChildren.map(child => <Wrapper key={child.id} item={child} />)}</>
+        result[slotName] = <>{slotsChildren.map(child => {
+          const Wrapper = WrapperFactory(child);
+          return <Wrapper key={child.id} item={child} />
+        })}</>
       }
     });
     return result;
@@ -253,7 +256,6 @@ export const _Wrapper = (props: any) => {
     );
   }
 
-  const refWrapped = useRef<any>();
   return <WrapperClass ref={it => refWrapped.current = it}>
     <Suspense fallback={''}>
       <Instanse
@@ -282,6 +284,11 @@ export const _Wrapper = (props: any) => {
 
 };
 
-export const Wrapper = DnDHOC('WRAPPER', _Wrapper);
+const Wrapper = DnDHOC('WRAPPER', WrapperConstructor);
 
-Wrapper.toString = () => String(Stepper.Step);
+export const WrapperFactory = (item) => {
+  const obj = { instanse: null };
+  getElement(item).then(instanse => obj.instanse = instanse);
+  Wrapper.toString = () => String(obj.instanse || Wrapper);
+  return Wrapper;
+}

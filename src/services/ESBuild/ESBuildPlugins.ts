@@ -125,7 +125,8 @@ export const pluginImage = (context: any): Plugin => {
 const getLibMainFileWebpackRelative = (libName: string) => {
     const mask = {
         'react': './node_modules/react/index.js',
-        'react-dom': './node_modules/react-dom/index.js',
+        'react-dom': './node_modules/react-dom/index.js',        
+        'react-router-dom': './node_modules/react-router-dom/index.js',
         'styled-components': './node_modules/styled-components/dist/styled-components.browser.esm.js',
         'vienna-ui': './node_modules/vienna-ui/esm/index.js',
     }

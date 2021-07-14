@@ -42,5 +42,5 @@ if (!window.frameElement) {
 
 export const { store, useRaxy } = instanse;
 
-logger(instanse.subscribe)
-connectDevTools(instanse);
+// logger(instanse.subscribe)
+// connectDevTools(instanse);
