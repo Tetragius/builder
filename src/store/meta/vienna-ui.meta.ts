@@ -331,6 +331,7 @@ export const metaViennaUi: IMeta = {
         namespace: 'vienna-ui',
         allowChildren: null,
         props: {
+            value: { value: '' },
             $text: { value: '' },
         },
         toolIcon: 'Select',

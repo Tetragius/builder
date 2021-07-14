@@ -95,6 +95,7 @@ const getCode = (item: IComponent, structure: IComponent[]): [IImports[], string
 
                 if (child.namespace === 'system' && child.name === 'Placeholder') {
                     imports.push(..._imports);
+                    slots.push(..._slots);
                 }
 
             }

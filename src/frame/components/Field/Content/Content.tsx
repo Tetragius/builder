@@ -8,17 +8,19 @@ import { Box } from './Content.styles';
 
 export const _Content = ({ onDragStart, onDragEnd, onDragOver, onDrop, id }: any) => {
 
-    const { state: { structure, styled, style, length } } = useRaxy<IStore>(store => ({
+    const { store, state: { styled, style, length } } = useRaxy<IStore>(store => ({
         styled: store.project.structure.find(item => item.id === id)?.styled,
         style: store.project.structure.find(item => item.id === id)?.style,
         structure: store.project.structure,
         length: store.project.structure.length
     }), { structure: { ignoreTimeStamp: true } })
 
+    const structure = store.project.structure;
+
     const children = useMemo(() => structure?.filter(s => s.parentId == id).map(item => {
         const Wrapper = WrapperFactory(item);
         return <Wrapper key={item.id} item={item} />;
-    }), [length, structure])
+    }), [length]);
 
     return (
         <Box

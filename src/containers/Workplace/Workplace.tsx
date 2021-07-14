@@ -11,13 +11,14 @@ export const Workplace = () => {
     const ref = useRef<any>();
     const refPS = useRef<any>();
 
-    const { store, state: { flags: { currentScreenId, currentFilePath, viewAll }, screens, isDirTree } } = useRaxy(store => (
+    const { store, state: { flags: { currentScreenId, currentFilePath, viewAll }, isDirTree } } = useRaxy(store => (
         {
             flags: store.flags.workplace,
-            screens: store.project.structure.filter(element => element.namespace === 'layer'),
+            length: store.project.structure.filter(element => element.namespace === 'layer').length,
             isDirTree: store.flags.leftBar.dirTree
         }));
-
+    
+    const screens =store.project.structure.filter(element => element.namespace === 'layer');
     const layer = screens?.find(layer => layer.id === currentScreenId);
 
     // const messageHandler = useCallback((e: any) => {

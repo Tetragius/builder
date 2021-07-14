@@ -48,6 +48,7 @@ export const WrapperConstructor = (props: any) => {
   }), {
     selected: { ignoreTimeStamp: true },
     hovered: { ignoreTimeStamp: true },
+    structure: { ignoreTimeStamp: true },
   });
 
   const { selected, hovered, structure, code, isDragMode } = state;
@@ -121,7 +122,7 @@ export const WrapperConstructor = (props: any) => {
   }, [item]);
 
   const hoverHandler = useCallback((e: any) => {
-    const parent = store.project.structure.find(i => i.id === item.parentId);
+    const parent = structure.find(i => i.id === item.parentId);
     if (parent?.name !== 'Tooltip') {
       e.stopPropagation();
     }
@@ -289,6 +290,6 @@ const Wrapper = DnDHOC('WRAPPER', WrapperConstructor);
 export const WrapperFactory = (item) => {
   const obj = { instanse: null };
   getElement(item).then(instanse => obj.instanse = instanse);
-  Wrapper.toString = () => String(obj.instanse || Wrapper);
+  Wrapper.toString = () => String(obj.instanse || "");
   return Wrapper;
 }

@@ -12,7 +12,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@tetragius/raxy-react": "^1.2.12",
+    "@tetragius/raxy-react": "^1.2.14",
     "assert-browserify": "^2.0.0",
     "buffer": "^6.0.3",
     "crypto-browserify": "^3.12.0",
