@@ -12,8 +12,7 @@ type Result = [IStyle, Importer[]]
 
 const extractValue = (value: any) => {
     if (value?.path) {
-        const file = value as IFile;
-        const url = value ? FS.readFileSync(path.resolve(file.path, file.name)) : '';
+        const url = value ? FS.readFileSync(path.resolve(value?.path)) : '';
         const importName = `img_${uniqueId()}`;
         return [url, importName];
     }

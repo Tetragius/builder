@@ -50,10 +50,17 @@ class _FS {
     this.vol.rmdirSync(path, { recursive: true });
   }
 
-  getFilesPathFromFolder = (dirPath: string): string[] =>
-    this.vol.readdirSync(dirPath)
-      .map((name) => path.join(dirPath, name))
-      .filter(filePath => this.vol.statSync(filePath).isFile());
+  getFilesPathFromFolder = (dirPath: string): string[] => {
+    try {
+      return this.vol.readdirSync(dirPath)
+        .map((name) => path.join(dirPath, name))
+        .filter(filePath => this.vol.statSync(filePath).isFile());
+    }
+    catch (e) {
+      return [];
+    }
+  }
+
 
   getPathsFromFolder = (dirPath: string): string[] => {
     const list: any = this.isDirectory(dirPath) &&

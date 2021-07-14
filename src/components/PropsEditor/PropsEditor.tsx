@@ -11,9 +11,10 @@ import { FS } from '../../services';
 
 const Field = ({ name, selected }) => {
 
-    const { store, state: { prop, value }, updateState } = useRaxy(_ => ({
+    const { store, state: { prop, value, projectName }, updateState } = useRaxy(store => ({
         prop: selected.props[name],
         value: selected.props[name]?.value,
+        projectName: store.project.name
     }));
 
     const handleOnChange = useCallback((e, data) => {
@@ -49,14 +50,14 @@ const Field = ({ name, selected }) => {
 
     if (prop?.allowAssetsUrl) {
 
-        // const images = store.fileSystem.filter(file => file.type === 'image');
+        const images = FS.getFilesPathFromFolder(`${projectName}/assets`).map(path => ({ path, name: path.split('/').pop() }));
 
         return <FormField style={{ width: '100%' }}>
             <FormField.Label>{name}</FormField.Label>
             <FormField.Content>
                 <Select
                     size='xs'
-                    options={[]}
+                    options={images}
                     value={value}
                     valueToString={(item) => item.name}
                     onSelect={(e, data) => prop.value = data.value} />

@@ -5,12 +5,14 @@ import { useRaxy } from '../../store/store';
 import { IComponent } from '../../interfaces';
 import { dictionary } from '../../store/meta/style';
 import { sortMetaArray } from '../../utils/sortDirArrayByName';
+import { FS } from '../../services';
 
 const Field = ({ name }) => {
 
-    const { store, state: { style, value }, updateState } = useRaxy(store => ({
+    const { store, state: { style, value, projectName }, updateState } = useRaxy(store => ({
         style: (store.project.selected as IComponent).style[name],
         value: (store.project.selected as IComponent).style[name]?.value,
+        projectName: store.project.name
     }));
 
     const handleOnChange = useCallback((e, data) => {
@@ -20,14 +22,14 @@ const Field = ({ name }) => {
 
     if (style.allowAssetsUrl) {
 
-        // const images = store.fileSystem.filter(file => file.type === 'image');
+        const images = FS.getFilesPathFromFolder(`${projectName}/assets`).map(path => ({ path, name: path.split('/').pop() }));
 
         return <FormField style={{ width: '100%' }}>
             <FormField.Label>{name}</FormField.Label>
             <FormField.Content>
                 <Select
                     size='xs'
-                    options={[]}
+                    options={images ?? []}
                     value={value}
                     valueToString={(item) => item.name}
                     onSelect={(e, data) => style.value = data?.value} />

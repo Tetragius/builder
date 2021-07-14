@@ -94,7 +94,7 @@ const getCode = (item: IComponent, structure: IComponent[]): [IImports[], string
                 }
 
                 if (child.namespace === 'system' && child.name === 'Placeholder') {
-                    imports.push( ..._imports);
+                    imports.push(..._imports);
                 }
 
             }
@@ -162,7 +162,6 @@ const constructStyled = (container: IComponent, imports: IImports[]): [string, s
     }).filter(c => c);
     if (container.styled) components.unshift(['Box', container]);
 
-
     const codeBlock = components.reduce((result, [name, component]) => {
         const [cssString, imps] = objToCSS(...styleFormatter(component.style, false));
         result += `export const ${name} = styled.div\`\n${cssString}\`;`;
@@ -170,9 +169,8 @@ const constructStyled = (container: IComponent, imports: IImports[]): [string, s
         return result;
     }, '') as string;
 
-
     const constatnsString = constants.reduce((result, item: Importer) => {
-        result += `import ${item.importName} from '${container.path}';`
+        result += `import ${item.importName} from '${path.relative(container.path, item.file.path)}';`
         return result;
     }, '');
 
