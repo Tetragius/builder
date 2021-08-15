@@ -151,7 +151,7 @@ export const PropsEditor = () => {
 
     return <Box>
         <Groups design="vertical" >
-            {keys.map(subKey => <Field key={subKey} name={subKey} selected={selected} />)}
+            {keys.map(subKey => <Field key={`${selected.id}_${subKey}`} name={subKey} selected={selected} />)}
             {selected.namespace === 'root' && <Button design="accent" style={{ width: '100%' }} loading={building} onClick={run}>Запусить</Button>}
             {(selected.namespace === 'layer' || selected.namespace === 'root') && <Button design="accent" style={{ width: '100%' }} loading={building} onClick={build}>Собрать</Button>}
             {selected.namespace === 'root' && <Button design="primary" style={{ width: '100%' }} onClick={save}>Сохранить</Button>}

@@ -17,13 +17,26 @@ import { useRaxy } from "@tetragius/raxy-react";
 import { clearFromPositionsStyles, styleFormatter } from "../../../utils/styleFormatter";
 import { Placeholder } from "../Slot";
 class WrapperClass extends React.PureComponent {
+
+  node = null;
+  dummy = null;
+
   constructor(props) {
     super(props);
   }
 
-  getNode = () => {
+  componentDidUpdate() {
     const node = ReactDOM.findDOMNode(this);
-    return node?.nodeType === 3 ? node.parentNode : node;
+    this.node = node?.nodeType === 3 ? node.parentNode : node;
+    if (this.dummy) {
+      this.dummy.remove();
+      this.dummy = null;
+    }
+    if (this.props.selected) {
+      this.dummy = document.createElement('div');
+      this.node.appendChild(this.dummy);
+      ReactDOM.unstable_renderSubtreeIntoContainer(this, <Delete onClick={this.props.onRemove} ><Close /></Delete>, this.dummy);
+    }
   }
 
   render() {
@@ -257,7 +270,7 @@ export const WrapperConstructor = (props: any) => {
     );
   }
 
-  return <WrapperClass ref={it => refWrapped.current = it}>
+  return <WrapperClass selected={selected} onRemove={remove} ref={it => refWrapped.current = it}>
     <Suspense fallback={''}>
       <Instanse
         id={item.id}
@@ -280,7 +293,6 @@ export const WrapperConstructor = (props: any) => {
         {constructChildren()}
       </Instanse>
     </Suspense>
-    {selected && refWrapped.current && ReactDOM.createPortal(<Delete onClick={remove}><Close /></Delete>, refWrapped.current.getNode())}
   </WrapperClass>
 
 };

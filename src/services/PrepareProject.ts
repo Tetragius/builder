@@ -7,6 +7,7 @@ import { capitalizeString } from "../utils/capitalizeString";
 import { Importer, styleFormatter } from '../utils/styleFormatter';
 import { updateMetaAndExistItems } from './Core';
 import { Monaco } from './Monaco';
+
 interface IImports {
     [key: string]: IComponent
 }
@@ -265,7 +266,7 @@ instanse.subscribe('update', async (e) => {
             data = data.replace(/(\/\/ \[\[slots:start\]\]).*(\/\/ \[\[slots:end\]\])/gms, `$1\n${constructSlots(slots)}\n$2`);
             data = data.replace(/(\/\/ \[\[code:start\]\]).*(\/\/ \[\[code:end\]\])/gms, `$1\n${wrapCode(layer, code)}\n$2`);
             data = data.replace(/(\/\*\[\[slots-const:start\]\]\*\/).*(\/\*\[\[slots-const:end\]\]\*\/)/gms, `$1${customSlotsNames.join(',')}${customSlotsNames.length ? ',' : ''}$2`);
-
+            
             FS.writeFileSync(`${path}/${layer.name}.tsx`, data);
             Monaco.updateModel(`${path}/${layer.name}.tsx`);
 

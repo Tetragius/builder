@@ -8,8 +8,9 @@ interface IFileModels {
 }
 class _Monaco {
 
-    monaco = _monaco;
+    monaco: typeof _monaco = _monaco;
     files: IFileModels = {};
+    editor: _monaco.editor.IStandaloneCodeEditor;
 
     constructor() {
 
@@ -40,12 +41,13 @@ class _Monaco {
         this.monaco.languages.typescript.typescriptDefaults.addExtraLib(xhr.response, `file:///node_modules/@types/${libName}/index.d.ts`);
     }
 
-    createEditor = (ref: HTMLDivElement, model?: monaco.editor.ITextModel): monaco.editor.IStandaloneCodeEditor => {
-        return this.monaco.editor.create(ref, {
+    createEditor = (ref: HTMLDivElement, model?: _monaco.editor.ITextModel): _monaco.editor.IStandaloneCodeEditor => {
+        this.editor = this.monaco.editor.create(ref, {
             theme: "vs-dark",
             automaticLayout: true,
             model: model
-        }) as monaco.editor.IStandaloneCodeEditor;
+        }) as _monaco.editor.IStandaloneCodeEditor;
+        return this.editor;
     }
 
     createModel = (path: string) => {
@@ -63,7 +65,12 @@ class _Monaco {
         const language = getFileTypeByPath(path);
         const data = FS.readFileSync(path, 'utf-8');
         const formated = language === 'typescript' ? prettierText(data) : data;
-        this.files[path]?.setValue(formated);
+        const file = this.files[path];
+        if (file?.getValue() !== formated) {
+            const position = this.editor?.getPosition();
+            file?.setValue(formated);
+            position && this.editor.setPosition(position);
+        }
     }
 
     removeModel = (path: string) => {

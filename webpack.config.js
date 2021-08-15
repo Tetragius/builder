@@ -22,6 +22,8 @@ module.exports = {
       buffer: require.resolve("buffer"),
       path: require.resolve("path-browserify"),
       assert: require.resolve("assert-browserify"),
+      os: require.resolve('os-browserify'),
+      constants: require.resolve('constants-browserify'),
       process: false,
     },
   },

@@ -1,8 +1,11 @@
 import React, { useEffect, useRef } from 'react';
 import { Box } from './Code.styled';
-import { useRaxy } from '../../store/store';
+import { store, useRaxy } from '../../store/store';
 import { Monaco } from '../../services/Monaco';
 import { FS } from '../../services';
+
+const jscodeshift = require('jscodeshift');
+const recast = require('recast');
 
 export const Code = () => {
 
@@ -22,7 +25,54 @@ export const Code = () => {
             else {
 
                 editor.current = Monaco.createEditor(ref.current, Monaco.createModel(currentFilePath));
-                // editor.current.onDidChangeModelContent(e => console.log(e));
+                editor.current.onDidChangeModelContent(e => {
+                    const change = e.changes[0];
+                    const value = editor.current.getModel().getValue();
+                    jscodeshift(value)
+                        .find(jscodeshift.JSXAttribute)
+                        .filter(({ value }) => value.start < change.rangeOffset && value.end > change.rangeOffset)
+                        .forEach(({ value, parent }) => {
+                            const elementId = parent.value.attributes[0].value.value;
+                            const element = store.project.structure.find(element => element.id === elementId);
+                            
+                            const propName = value.name.name;
+                            const propValue = value.value.value;
+
+                            if (element.props[propName]) {
+                                element.props[propName].value = propValue;
+                            }
+                            else {
+                                element.props[propName] = { value: propValue };
+                            }
+
+                        });
+                    jscodeshift(value)
+                        .find(jscodeshift.JSXText)
+                        .filter(({ value }) => value.start < change.rangeOffset && value.end > change.rangeOffset)
+                        .forEach(({ value, parent }) => {
+                            const elementId = parent.value.openingElement.attributes[0].value.value;
+                            const element = store.project.structure.find(element => element.id === elementId);
+
+                            const text = value.value;
+                            element.props['$text'].value = text.replace(/\n/gmi, '').trim();
+
+                        });
+                });
+
+                editor.current.onDidChangeCursorPosition(e => {
+                    const model = editor.current.getModel();
+                    const offset = model.getOffsetAt(e.position);
+                    const value = editor.current.getModel().getValue();
+                    jscodeshift(value)
+                        .find(jscodeshift.JSXOpeningElement)
+                        .filter(({ value }) => value.start < offset && value.end > offset)
+                        .forEach(({ value }) => {
+                            const elementId = value.attributes[0].value.value;
+                            if (elementId) {
+                                store.project.selected = store.project.structure.find(element => element.id === elementId);
+                            }
+                        });
+                });
             }
 
         }

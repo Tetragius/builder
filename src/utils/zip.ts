@@ -6,7 +6,7 @@ import { prettierText } from './prettier';
 export const zip = async (projectName: string) => {
     const zip = new JSZip();
     const filesPaths = FS.getPathsFromFolderReq(projectName);
-    console.log(filesPaths);
+    // console.log(filesPaths);
     await Promise.all(filesPaths
         .filter(filesPath => !filesPath.includes('node_modules'))
         .map(async filePath => {
