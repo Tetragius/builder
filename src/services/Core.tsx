@@ -84,6 +84,9 @@ export const extractProps = (props) => {
     const result = {};
 
     for (const prop in props) {
+        if (props[prop].type === 'expression') {
+            continue;
+        }
         if (props[prop].allowAssetsUrl) {
             const file = props[prop].value as IFile;
             const url = props[prop].value ? FS.readFileSync(path.resolve(file.path, file.name)) : '';

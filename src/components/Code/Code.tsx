@@ -28,24 +28,28 @@ export const Code = () => {
                 editor.current.onDidChangeModelContent(e => {
                     const change = e.changes[0];
                     const value = editor.current.getModel().getValue();
+
                     jscodeshift(value)
                         .find(jscodeshift.JSXAttribute)
                         .filter(({ value }) => value.start < change.rangeOffset && value.end > change.rangeOffset)
                         .forEach(({ value, parent }) => {
                             const elementId = parent.value.attributes[0].value.value;
                             const element = store.project.structure.find(element => element.id === elementId);
-                            
+
+                            const type = value.value.type;
                             const propName = value.name.name;
                             const propValue = value.value.value;
+                            const propExpression = value.value.expression;
 
-                            if (element.props[propName]) {
+                            if (element.props[propName] && type !== 'JSXExpressionContainer') {
                                 element.props[propName].value = propValue;
                             }
                             else {
-                                element.props[propName] = { value: propValue };
+                                element.props[propName] = { value: recast.print(propExpression).code, type: 'expression' };
                             }
 
                         });
+
                     jscodeshift(value)
                         .find(jscodeshift.JSXText)
                         .filter(({ value }) => value.start < change.rangeOffset && value.end > change.rangeOffset)
@@ -57,6 +61,9 @@ export const Code = () => {
                             element.props['$text'].value = text.replace(/\n/gmi, '').trim();
 
                         });
+
+                    FS.writeFileSync(currentFilePath, value);
+
                 });
 
                 editor.current.onDidChangeCursorPosition(e => {
